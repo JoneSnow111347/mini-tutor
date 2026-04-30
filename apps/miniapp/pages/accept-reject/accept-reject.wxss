@@ -1,0 +1,97 @@
+.demand-title {
+  margin-top: 12rpx;
+}
+
+.teacher-card {
+  animation: slide-down 0.3s ease both;
+}
+
+.teacher-top {
+  display: flex;
+  gap: 22rpx;
+  align-items: flex-start;
+}
+
+.avatar {
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 30rpx;
+  background: linear-gradient(145deg, #e8f2ff, #ffffff);
+  color: #007aff;
+  font-size: 42rpx;
+  font-weight: 800;
+  line-height: 104rpx;
+  text-align: center;
+}
+
+.teacher-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.teacher-name {
+  display: block;
+  color: #111827;
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.teacher-subjects {
+  display: block;
+  margin-top: 8rpx;
+  color: #6b7280;
+  font-size: 25rpx;
+  line-height: 1.45;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 26rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #edf0f4;
+}
+
+.info-key {
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.info-val {
+  color: #111827;
+  font-size: 25rpx;
+  font-weight: 650;
+}
+
+.message-box {
+  margin-top: 22rpx;
+  padding: 20rpx;
+  border-radius: 22rpx;
+  background: #f5f7fb;
+}
+
+.message-text {
+  display: block;
+  margin-top: 10rpx;
+  color: #374151;
+  font-size: 25rpx;
+  line-height: 1.55;
+}
+
+.profile-hint {
+  display: block;
+  margin-top: 18rpx;
+  color: #007aff;
+  font-size: 25rpx;
+  font-weight: 700;
+  text-align: right;
+}
+
+.decision-actions {
+  display: flex;
+  gap: 18rpx;
+}
+
+.decision-actions button {
+  flex: 1;
+}

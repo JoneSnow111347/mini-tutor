@@ -1,0 +1,49 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="empty-tip">正在加载申请...</view>
+
+  <block wx:elif="{{apply}}">
+    <view wx:if="{{demand}}" class="card">
+      <text class="eyebrow">所属需求</text>
+      <text class="card-title demand-title">{{demand.title}}</text>
+      <text class="card-meta">{{demand.subject}} · {{demand.grade_level}} · {{demand.area}}</text>
+    </view>
+
+    <view class="card teacher-card card-tap" bindtap="goTeacherProfile">
+      <view class="teacher-top">
+        <view class="avatar">
+          <text>{{teacherInitial}}</text>
+        </view>
+        <view class="teacher-main">
+          <text class="teacher-name">{{teacher ? teacher.real_name : teacherFallback + apply.teacher_user_id}}</text>
+          <text wx:if="{{teacher}}" class="teacher-subjects">{{teacher.teaching_subjects}}</text>
+          <view class="badge-row">
+            <text wx:if="{{teacher && teacher.verification_status === 'verified'}}" class="badge badge-verified">已认证</text>
+            <text class="badge badge-{{apply.status}}">{{apply.statusText}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="info-row">
+        <text class="info-key">申请时间</text>
+        <text class="info-val">{{apply.dateText}}</text>
+      </view>
+
+      <view wx:if="{{apply.message}}" class="message-box">
+        <text class="info-key">申请留言</text>
+        <text class="message-text">{{apply.message}}</text>
+      </view>
+      <text wx:if="{{teacher}}" class="profile-hint">点击查看完整老师资料  </text>
+    </view>
+
+    <view wx:if="{{apply.status === 'pending'}}" class="decision-actions">
+      <button class="btn-success" disabled="{{submitting}}" loading="{{submitting}}" bindtap="confirmAccept">接受申请</button>
+      <button class="btn-danger" disabled="{{submitting}}" bindtap="confirmReject">拒绝申请</button>
+    </view>
+
+    <view wx:else class="status-banner {{apply.status === 'accepted' ? 'banner-success' : 'banner-danger'}}">
+      <text class="status-banner-title">该申请已处理</text>
+      <text class="status-banner-sub">当前状态：{{apply.statusText}}</text>
+    </view>
+  </block>
+  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
+</view>

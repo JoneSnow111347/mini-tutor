@@ -1,0 +1,141 @@
+.profile-card {
+  margin-bottom: 22rpx;
+  padding: 30rpx;
+  border-radius: 34rpx;
+  background: linear-gradient(145deg, #ffffff, #edf7ff);
+  box-shadow: 0 20rpx 48rpx rgba(31, 41, 55, 0.09);
+  animation: slide-down 0.3s ease both;
+}
+
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.profile-avatar {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 32rpx;
+  background: linear-gradient(135deg, #007aff 0%, #34c8ff 100%);
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 16rpx 34rpx rgba(0, 122, 255, 0.2);
+}
+
+.profile-avatar-text {
+  font-size: 48rpx;
+  font-weight: 800;
+  line-height: 112rpx;
+}
+
+.profile-hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  display: block;
+  color: #111827;
+  font-size: 42rpx;
+  font-weight: 800;
+}
+
+.summary-grid {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 28rpx;
+}
+
+.summary-item {
+  flex: 1;
+  padding: 22rpx 12rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.82);
+  text-align: center;
+}
+
+.summary-value {
+  display: block;
+  color: #111827;
+  font-size: 31rpx;
+  font-weight: 800;
+}
+
+.summary-label {
+  display: block;
+  margin-top: 8rpx;
+  color: #6b7280;
+  font-size: 23rpx;
+}
+
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 22rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #edf0f4;
+}
+
+.profile-row.last {
+  border-bottom: 0;
+}
+
+.prow-key {
+  flex-shrink: 0;
+  color: #6b7280;
+  font-size: 25rpx;
+}
+
+.prow-val {
+  max-width: 66%;
+  color: #111827;
+  font-size: 26rpx;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.edit-card {
+  padding-bottom: 4rpx;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 18rpx 0 26rpx;
+}
+
+.switch-label {
+  margin-bottom: 0;
+}
+
+.cancel-button {
+  margin-top: 18rpx;
+}
+
+.empty-card {
+  margin-top: 120rpx;
+  padding: 44rpx 30rpx;
+  border-radius: 34rpx;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 18rpx 46rpx rgba(31, 41, 55, 0.08);
+}
+
+.empty-title {
+  display: block;
+  color: #111827;
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.empty-sub {
+  display: block;
+  margin: 14rpx 0 34rpx;
+  color: #6b7280;
+  font-size: 26rpx;
+  line-height: 1.45;
+}

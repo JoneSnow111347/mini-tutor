@@ -1,0 +1,25 @@
+{
+  "name": "\u6b66\u6c49\u5bb6\u6559",
+  "appid": "__UNI__REPLACE_ME",
+  "description": "\u6b66\u6c49\u5bb6\u6559\u5c0f\u7a0b\u5e8f",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "wx_REPLACE_WITH_REAL_APPID",
+    "setting": {
+      "urlCheck": false
+    },
+    "usingComponents": true,
+    "permission": {
+      "scope.userLocation": {
+        "desc": "\u7528\u4e8e\u4e3a\u60a8\u63a8\u8350\u9644\u8fd1\u7684\u5bb6\u6559\u4e0e\u5b66\u4e60\u9700\u6c42"
+      }
+    }
+  },
+  "h5": {
+    "devServer": {
+      "port": 8080
+    }
+  }
+}

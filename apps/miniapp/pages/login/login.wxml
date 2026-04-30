@@ -1,0 +1,38 @@
+<view class="page login-page">
+  <view class="login-hero">
+    <view class="app-mark">武</view>
+    <text class="title">武汉家教</text>
+    <text class="subtitle">家长发布需求，教师浏览接单。先选择身份，再登录进入小程序。</text>
+  </view>
+
+  <view class="card login-card">
+    <view class="role-group">
+      <button class="role-button {{role === 'parent' ? 'role-active' : ''}}" data-role="parent" bindtap="selectRole">
+        家长 / 学生
+      </button>
+      <button class="role-button {{role === 'teacher' ? 'role-active' : ''}}" data-role="teacher" bindtap="selectRole">
+        教师
+      </button>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">手机号<text class="required">*</text></text>
+      <input class="form-input" type="number" maxlength="11" placeholder="请输入手机号" placeholder-class="placeholder" value="{{phone}}" bindinput="onPhoneInput" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">密码<text class="required">*</text></text>
+      <input class="form-input" password maxlength="24" placeholder="至少 6 位" placeholder-class="placeholder" value="{{password}}" bindinput="onPasswordInput" bindconfirm="handleLogin" />
+    </view>
+
+    <view wx:if="{{message}}" class="feedback {{feedbackType}}">
+      <text>{{message}}</text>
+    </view>
+
+    <button class="btn-primary login-button" loading="{{loading}}" disabled="{{loading}}" bindtap="handleLogin">
+      {{loading ? '登录中...' : '登录'}}
+    </button>
+
+    <button class="register-link" bindtap="goRegister">没有账号？点击注册</button>
+  </view>
+</view>

@@ -1,0 +1,48 @@
+<view class="page">
+  <view class="dashboard-head">
+    <view>
+      <text class="eyebrow">家长工作台</text>
+      <text class="title">{{userName}}，你好</text>
+      <text class="subtitle">查看需求、处理教师申请，并同步最新状态。</text>
+    </view>
+    <view class="notify-button" bindtap="openNotifications">
+      <text class="notify-icon">铃</text>
+      <view wx:if="{{pendingCount > 0}}" class="notification-badge {{badgeFlash ? 'badge-flash' : ''}}">{{pendingCount > 99 ? '99+' : pendingCount}}</view>
+    </view>
+  </view>
+  <view wx:if="{{pendingCount > 0}}" class="status-banner banner-info">
+    <text class="status-banner-title">有 {{pendingCount}} 个待处理申请</text>
+    <text class="status-banner-sub">下拉刷新或进入申请列表可同步最新处理状态。</text>
+  </view>
+  <view class="summary-card">
+    <view class="summary-item"><text class="summary-value">{{stats.total}}</text><text class="summary-label">需求</text></view>
+    <view class="summary-divider"></view>
+    <view class="summary-item"><text class="summary-value warn">{{stats.pending}}</text><text class="summary-label">待处理</text></view>
+    <view class="summary-divider"></view>
+    <view class="summary-item"><text class="summary-value ok">{{stats.accepted}}</text><text class="summary-label">已接收</text></view>
+  </view>
+  <view class="action-grid">
+    <button class="action-card primary-action" bindtap="goPublishDemand"><text class="action-title">发布需求</text><text class="action-desc">填写科目、区域和联系方式</text></button>
+    <button class="action-card" bindtap="goApplications"><text class="action-title">查看申请</text><text class="action-desc">审批教师请求</text><view wx:if="{{pendingCount > 0}}" class="dot-badge"></view></button>
+    <button class="action-card" bindtap="goMyOrders"><text class="action-title">我的订单</text><text class="action-desc">查看需求及订单状态</text></button>
+    <button class="action-card" bindtap="openNotifications"><text class="action-title">消息通知</text><text class="action-desc">申请动态与审批结果</text><view wx:if="{{pendingCount > 0}}" class="dot-badge"></view></button>
+  </view>
+  <view class="section-head"><text class="section-title">已发布需求</text><text class="section-link" bindtap="goMyOrders">全部</text></view>
+  <view wx:if="{{loading}}" class="empty-tip">正在同步需求...</view>
+  <view wx:elif="{{demands.length === 0}}" class="empty-tip">还没有发布需求</view>
+  <view wx:for="{{demands}}" wx:key="id" class="card demand-card {{closingDemandId === item.id ? 'card-closing' : ''}}">
+    <view class="card-row card-tap" data-id="{{item.id}}" bindtap="viewDemandApplications">
+      <view class="demand-main"><text class="card-title">{{item.title}}</text><text class="card-meta">{{item.subject}} · {{item.grade_level}} · {{item.class_mode}}</text></view>
+      <text class="badge badge-{{item.displayStatus}}">{{item.statusText}}</text>
+    </view>
+    <text class="card-meta">区域：{{item.area}}</text>
+    <text class="card-meta">发布：{{item.dateText}}</text>
+    <view class="demand-foot"><text>申请 {{item.applicantCount}}</text><text class="warn">待处理 {{item.pendingCount}}</text><text class="ok">已接收 {{item.acceptedCount}}</text></view>
+    <view class="demand-actions">
+      <button class="fav-btn {{item.isFav ? 'fav-active' : ''}}" data-id="{{item.id}}" catchtap="toggleFavDemand">{{item.isFav ? '已收藏' : '收藏'}}</button>
+      <button class="detail-button" data-id="{{item.id}}" catchtap="showDemandDetail">查看详情</button>
+      <button wx:if="{{item.canClose}}" class="close-button" data-id="{{item.id}}" catchtap="closeDemand">关闭订单</button>
+    </view>
+  </view>
+  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
+</view>

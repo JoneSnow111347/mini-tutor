@@ -1,0 +1,152 @@
+.tab-bar {
+  display: flex;
+  gap: 8rpx;
+  margin-bottom: 28rpx;
+  padding: 8rpx;
+  border-radius: 30rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 28rpx rgba(31, 41, 55, 0.07);
+}
+
+.tab-item {
+  flex: 1;
+  height: 74rpx;
+  border-radius: 24rpx;
+  color: #6b7280;
+  font-size: 27rpx;
+  font-weight: 700;
+  line-height: 74rpx;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.tab-active {
+  background: linear-gradient(135deg, #007aff, #34c8ff);
+  color: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(0, 122, 255, 0.26);
+}
+
+.demand-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.demand-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #edf0f4;
+  color: #6b7280;
+  font-size: 23rpx;
+}
+
+.warn-text { color: #f59e0b; }
+.ok-text   { color: #34c759; }
+
+.card-actions {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+}
+
+.close-btn {
+  flex: 1;
+  min-height: 66rpx;
+  border-radius: 18rpx;
+  background: #fff0f0;
+  color: #d92d20;
+  font-size: 25rpx;
+  font-weight: 750;
+  line-height: 66rpx;
+}
+
+.unfav-btn {
+  width: 100%;
+  margin-top: 16rpx;
+  min-height: 66rpx;
+  border-radius: 18rpx;
+  background: #fff7f0;
+  color: #c2410c;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 66rpx;
+}
+
+/* Teacher profile card in parent favorites */
+.teacher-fav-card .card-row {
+  align-items: center;
+}
+
+.teacher-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 22rpx;
+  background: linear-gradient(135deg, #007aff, #34c8ff);
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 800;
+  line-height: 72rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.teacher-fav-main {
+  flex: 1;
+  min-width: 0;
+  padding: 0 14rpx;
+}
+
+/* Teacher applies */
+.apply-card {
+  cursor: pointer;
+}
+
+.apply-foot {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-top: 16rpx;
+}
+
+.apply-hint {
+  display: block;
+  margin-top: 14rpx;
+  color: #007aff;
+  font-size: 25rpx;
+  font-weight: 700;
+  text-align: right;
+}
+
+.apply-hint.accepted { color: #16833a; }
+.apply-hint.muted    { color: #9ca3af; }
+
+/* Close order animation */
+@keyframes card-slide-out {
+  from { opacity: 1; transform: translateX(0) scaleY(1); max-height: 400rpx; }
+  to   { opacity: 0; transform: translateX(-48rpx) scaleY(0.88); max-height: 0; padding: 0; margin: 0; }
+}
+
+.card-closing {
+  animation: card-slide-out 0.36s ease forwards;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Status badge flash animation */
+@keyframes badge-flash {
+  0%   { transform: scale(1); }
+  20%  { transform: scale(1.35); box-shadow: 0 0 0 6rpx rgba(0, 122, 255, 0.18); }
+  50%  { transform: scale(0.92); }
+  75%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.badge-flash {
+  animation: badge-flash 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}

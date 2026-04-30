@@ -1,0 +1,86 @@
+<view class="container home-page">
+  <block wx:if="{{!isLoggedIn}}">
+    <view class="hero">
+      <text class="hero-icon">武</text>
+      <text class="hero-title">家教平台</text>
+      <text class="hero-sub">武汉本地家教撮合平台</text>
+    </view>
+    <view class="btn-group">
+      <button class="btn-primary" bindtap="goParentLogin">
+        <view class="btn-inner">
+          <text class="btn-emoji">家</text>
+          <text class="btn-label">我是家长 / 学生</text>
+        </view>
+      </button>
+      <button class="btn-secondary" bindtap="goTeacherLogin">
+        <view class="btn-inner">
+          <text class="btn-emoji">师</text>
+          <text class="btn-label">我是教师</text>
+        </view>
+      </button>
+    </view>
+    <text class="home-footer">遇见合适老师，从这里开始</text>
+  </block>
+  <block wx:elif="{{role === 'parent' || role === 'student' || role === 'both'}}">
+    <view class="card greeting-card" bindtap="goMyPage">
+      <view class="greeting-inner">
+        <view>
+          <text class="greeting-name">你好，{{nickname || '家长'}}</text>
+          <text class="greeting-role">家长 / 学生账号</text>
+        </view>
+        <text class="greeting-arrow">></text>
+      </view>
+    </view>
+    <text class="section-title">快捷操作</text>
+    <view class="menu-grid">
+      <view class="menu-tile" bindtap="goPublishDemand">
+        <text class="tile-icon">发</text>
+        <text class="tile-label">发布需求</text>
+        <text class="tile-desc">发布一个新的家教需求</text>
+      </view>
+      <view class="menu-tile badge-wrap" bindtap="goViewApplications">
+        <view wx:if="{{pendingCount > 0}}" class="badge-dot">{{pendingCount > 99 ? '99+' : pendingCount}}</view>
+        <text class="tile-icon">申</text>
+        <text class="tile-label">查看申请</text>
+        <text class="tile-desc">查看教师提交的申请</text>
+      </view>
+    </view>
+  </block>
+  <block wx:elif="{{role === 'teacher'}}">
+    <view class="card greeting-card" bindtap="goMyPage">
+      <view class="greeting-inner">
+        <view>
+          <text class="greeting-name">你好，{{nickname || '教师'}}</text>
+          <text class="greeting-role">教师账号</text>
+        </view>
+        <text class="greeting-arrow">></text>
+      </view>
+    </view>
+    <text class="section-title">快捷操作</text>
+    <view class="menu-grid">
+      <view class="menu-tile" bindtap="goTeacherProfile">
+        <text class="tile-icon">资</text>
+        <text class="tile-label">我的资料</text>
+        <text class="tile-desc">查看和编辑教师资料</text>
+      </view>
+      <view class="menu-tile badge-wrap" bindtap="goBrowseDemands">
+        <view wx:if="{{notificationCount > 0}}" class="badge-dot">{{notificationCount > 99 ? '99+' : notificationCount}}</view>
+        <text class="tile-icon">找</text>
+        <text class="tile-label">浏览需求</text>
+        <text class="tile-desc">查找合适的家教需求</text>
+      </view>
+    </view>
+    <block wx:if="{{studentNotifications.length > 0}}">
+      <text class="section-title">最近通知</text>
+      <view wx:for="{{studentNotifications}}" wx:key="applyId" class="notif-item notif-{{item.status}} {{item.read ? 'notif-read' : ''}}">
+        <text class="notif-icon">{{item.status === 'accepted' ? '成' : '拒'}}</text>
+        <view class="notif-body">
+          <text class="notif-title">{{item.demandTitle || '未命名需求'}}</text>
+          <text class="notif-status">{{item.status === 'accepted' ? '申请已通过' : '申请未通过'}}</text>
+        </view>
+        <view wx:if="{{!item.read}}" class="notif-unread-dot"></view>
+      </view>
+    </block>
+  </block>
+  <button wx:if="{{isLoggedIn}}" class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
+</view>

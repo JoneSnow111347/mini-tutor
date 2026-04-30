@@ -1,0 +1,72 @@
+.edit-card {
+  padding-bottom: 8rpx;
+  animation: slide-down 0.3s ease both;
+}
+
+.small-textarea {
+  min-height: 150rpx;
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  margin-bottom: 26rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #edf0f4;
+}
+
+.verify-row {
+  display: flex;
+  gap: 10rpx;
+  padding: 8rpx;
+  border-radius: 24rpx;
+  background: #eef1f6;
+}
+
+.verify-button {
+  flex: 1;
+  min-height: 70rpx;
+  padding: 0 8rpx;
+  border-radius: 18rpx;
+  background: transparent;
+  color: #6b7280;
+  font-size: 23rpx;
+  font-weight: 750;
+  line-height: 70rpx;
+}
+
+.verify-active {
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 10rpx 24rpx rgba(31, 41, 55, 0.1);
+}
+
+.prow-key {
+  color: #6b7280;
+  font-size: 25rpx;
+  font-weight: 650;
+}
+
+.prow-val {
+  color: #111827;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 10rpx 0 22rpx;
+}
+
+.switch-label {
+  margin-bottom: 0;
+}
+
+.cancel-button {
+  margin-top: 18rpx;
+}

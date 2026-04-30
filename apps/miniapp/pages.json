@@ -1,0 +1,90 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "\u6b66\u6c49\u5bb6\u6559"
+      }
+    },
+    {
+      "path": "pages/auth/parent-login",
+      "style": {
+        "navigationBarTitleText": "\u5bb6\u957f\u767b\u5f55"
+      }
+    },
+    {
+      "path": "pages/auth/parent-register",
+      "style": {
+        "navigationBarTitleText": "\u5bb6\u957f\u6ce8\u518c"
+      }
+    },
+    {
+      "path": "pages/auth/teacher-login",
+      "style": {
+        "navigationBarTitleText": "\u6559\u5e08\u767b\u5f55"
+      }
+    },
+    {
+      "path": "pages/auth/teacher-register",
+      "style": {
+        "navigationBarTitleText": "\u6559\u5e08\u6ce8\u518c"
+      }
+    },
+    {
+      "path": "pages/parent/home",
+      "style": {
+        "navigationBarTitleText": "\u5bb6\u957f\u9996\u9875"
+      }
+    },
+    {
+      "path": "pages/parent/publish-demand",
+      "style": {
+        "navigationBarTitleText": "\u53d1\u5e03\u9700\u6c42"
+      }
+    },
+    {
+      "path": "pages/parent/my-demands",
+      "style": {
+        "navigationBarTitleText": "\u6211\u7684\u9700\u6c42"
+      }
+    },
+    {
+      "path": "pages/parent/view-applications",
+      "style": {
+        "navigationBarTitleText": "\u67e5\u770b\u7533\u8bf7"
+      }
+    },
+    {
+      "path": "pages/teacher/home",
+      "style": {
+        "navigationBarTitleText": "\u6559\u5e08\u9996\u9875"
+      }
+    },
+    {
+      "path": "pages/teacher/profile",
+      "style": {
+        "navigationBarTitleText": "\u6559\u5e08\u8d44\u6599"
+      }
+    },
+    {
+      "path": "pages/teacher/browse-demands",
+      "style": {
+        "navigationBarTitleText": "\u6d4f\u89c8\u9700\u6c42"
+      }
+    },
+    {
+      "path": "pages/teacher/apply-demand",
+      "style": {
+        "navigationBarTitleText": "\u7533\u8bf7\u63a5\u5355"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarBackgroundColor": "#4a90e2",
+    "navigationBarTitleText": "\u6b66\u6c49\u5bb6\u6559",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f7fa",
+    "backgroundTextStyle": "light"
+  },
+  "uniIdRouter": {}
+}

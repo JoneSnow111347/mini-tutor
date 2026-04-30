@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "\u7533\u8bf7\u7ba1\u7406",
+  "navigationBarBackgroundColor": "#f5f7fb",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f5f7fb",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}

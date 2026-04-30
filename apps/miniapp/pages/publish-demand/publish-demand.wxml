@@ -1,0 +1,28 @@
+<view class="container">
+  <view class="ios-hero">
+    <text class="eyebrow">发布需求</text>
+    <text class="title">找到合适老师</text>
+    <text class="subtitle">清楚描述科目、年级、区域和目标，老师会基于这些信息申请接单。</text>
+  </view>
+  <view class="card">
+    <view class="form-group">
+      <text class="form-label">需求标题<text class="required">*</text></text>
+      <input class="form-input" maxlength="50" placeholder="如：初二数学周末辅导" placeholder-class="placeholder" value="{{title}}" bindinput="onTitleInput" />
+      <text class="char-count">{{title.length}} / 50</text>
+    </view>
+    <view class="inline-grid">
+      <view class="form-group"><text class="form-label">科目<text class="required">*</text></text><input class="form-input" maxlength="30" placeholder="数学" placeholder-class="placeholder" value="{{subject}}" bindinput="onSubjectInput" /></view>
+      <view class="form-group"><text class="form-label">年级<text class="required">*</text></text><input class="form-input" maxlength="30" placeholder="初二" placeholder-class="placeholder" value="{{grade_level}}" bindinput="onGradeInput" /></view>
+    </view>
+    <view class="form-group"><text class="form-label">上课区域<text class="required">*</text></text><input class="form-input" maxlength="50" placeholder="如：武汉市洪山区" placeholder-class="placeholder" value="{{area}}" bindinput="onAreaInput" /></view>
+    <view class="form-group"><text class="form-label">上课方式<text class="required">*</text></text><view class="mode-row"><view wx:for="{{classModeOptions}}" wx:key="*this" class="mode-chip {{class_mode === item ? 'active' : ''}}" data-mode="{{item}}" bindtap="selectClassMode">{{item}}</view></view></view>
+    <view class="form-group"><text class="form-label">详细说明<text class="required">*</text></text><textarea class="form-textarea" maxlength="500" placeholder="说明学生情况、时间安排、希望提升的方向等" placeholder-class="placeholder" value="{{description}}" bindinput="onDescInput" /><text class="char-count">{{description.length}} / 500</text></view>
+  </view>
+  <view class="card privacy-card"><view><text class="card-title">联系方式隐私</text><text class="card-meta">默认仅对已接受的老师展示，保护家长手机号。</text></view><switch checked="{{is_private}}" color="#34c759" bindchange="togglePrivacy" /></view>
+  <view class="card">
+    <view class="form-group"><text class="form-label">联系人<text class="required">*</text></text><input class="form-input" maxlength="20" placeholder="如：李女士" placeholder-class="placeholder" value="{{contact_name}}" bindinput="onContactNameInput" /></view>
+    <view class="form-group last-field"><text class="form-label">联系电话<text class="required">*</text></text><input class="form-input" type="number" maxlength="11" placeholder="请输入 11 位手机号" placeholder-class="placeholder" value="{{contact_phone}}" bindinput="onContactPhoneInput" /></view>
+  </view>
+  <button class="btn-primary submit-button" disabled="{{loading}}" loading="{{loading}}" bindtap="handleSubmit">{{loading ? '发布中...' : '发布需求'}}</button>
+  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
+</view>

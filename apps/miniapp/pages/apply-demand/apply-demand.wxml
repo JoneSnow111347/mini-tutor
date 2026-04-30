@@ -1,0 +1,46 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="empty-tip">正在加载需求...</view>
+
+  <block wx:elif="{{demand}}">
+    <view class="card">
+      <text class="card-title">{{demand.title}}</text>
+      <view class="tag-row">
+        <text class="tag">{{demand.subject}}</text>
+        <text class="tag">{{demand.grade_level}}</text>
+        <text class="tag">{{demand.class_mode}}</text>
+      </view>
+      <view class="detail-row">
+        <text class="detail-key">上课区域</text>
+        <text class="detail-val">{{demand.area}}</text>
+      </view>
+      <text class="desc-block">{{demand.description}}</text>
+    </view>
+
+    <view wx:if="{{applyStatus === 'accepted'}}" class="status-banner banner-success">
+      <text class="status-banner-title">申请已接单</text>
+      <text class="status-banner-sub">家长会通过你留下的信息联系你。</text>
+    </view>
+
+    <view wx:elif="{{applyStatus === 'rejected'}}" class="status-banner banner-danger">
+      <text class="status-banner-title">申请未通过</text>
+      <text class="status-banner-sub">你可以继续申请其他合适的需求。</text>
+    </view>
+
+    <view wx:elif="{{alreadyApplied}}" class="status-banner banner-info">
+      <text class="status-banner-title">申请已提交，等待家长审核</text>
+      <text class="status-banner-sub">页面会每 5 秒自动同步一次状态。</text>
+    </view>
+
+    <block wx:else>
+      <text class="section-title">申请留言（可选）</text>
+      <view class="form-group">
+        <textarea class="form-textarea" maxlength="300" placeholder="简单介绍你的教学经验和优势" placeholder-class="placeholder" value="{{message}}" bindinput="onMessageInput" />
+        <text class="char-count">{{message.length}} / 300</text>
+      </view>
+      <button class="btn-primary" disabled="{{submitting}}" loading="{{submitting}}" bindtap="handleApply">
+        {{submitting ? '提交中...' : '申请接单'}}
+      </button>
+    </block>
+  </block>
+  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
+</view>

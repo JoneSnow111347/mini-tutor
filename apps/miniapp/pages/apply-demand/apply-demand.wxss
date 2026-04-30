@@ -1,0 +1,26 @@
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid #edf0f4;
+}
+
+.detail-key {
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.detail-val {
+  color: #111827;
+  font-size: 25rpx;
+  font-weight: 650;
+}
+
+.desc-block {
+  display: block;
+  margin-top: 18rpx;
+  color: #374151;
+  font-size: 26rpx;
+  line-height: 1.6;
+}

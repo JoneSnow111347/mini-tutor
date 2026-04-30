@@ -1,0 +1,25 @@
+You are a front-end documentation generator. Please generate a **complete front-end development document** and save it as `docs/dev_front.md` in the project. Requirements:
+
+1. Target platform: Mini Program (WeChat / UniApp). Pages include:
+   - Home, Parent Register/Login, Publish Demand, View Applications, Accept/Reject
+   - Teacher Register/Login, Teacher Profile, Browse Demands, Apply Demand
+
+2. For each page, include:
+   - Function description
+   - Backend API used, method, request body, response format
+
+3. Data structures consistent with backend:
+   - User, Teacher, Demand, Apply
+
+4. API interface table with fields, request and response formats
+
+5. Development notes:
+   - API response format: { success: true, data: ... }
+   - GET requests do not use body, POST requests require all fields
+   - State management instructions for front-end
+
+6. Markdown format
+
+7. Include a textual flow diagram at the end (Parent → Demand → Teacher → Apply)
+
+8. Document style must follow professional engineering standards suitable for direct front-end development.

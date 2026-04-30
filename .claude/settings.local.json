@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/hdbsrp/apps/miniapp/pages/**)",
+      "Read(//Users/**)",
+      "Bash(ls \"D:\\\\\\\\tutor-miniapp\\\\\\\\apps\\\\\\\\\")",
+      "Bash(sed -n '12,22p' apps/miniapp/pages/home/home.wxml)",
+      "Bash(sed -n '33,58p' apps/miniapp/pages/home/home.wxss)",
+      "Bash(node --input-type=module --eval \"\")",
+      "Bash(node -e ' *)",
+      "Bash(node *)",
+      "Bash(grep -Prn \"[^\\\\x00-\\\\x7F]{2,}\" \"D:/tutor-miniapp/apps/miniapp/pages/\" --include=\"*.js\")",
+      "Bash(grep -v \"//\\\\|'[一-龥]\\\\|\\\\\"[一-龥]\\\\|\\\\`[一-龥]\")",
+      "Bash(python3 *)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(echo \"entities:$?\")",
+      "Bash(echo \"replacement-chars:$?\")",
+      "Bash(echo \"done:$?\")",
+      "Bash(echo \"high-byte:$?\" grep -rn \"&#x\" apps/miniapp/pages/ --include=\"*.wxml\")",
+      "Bash(echo \"entity:$?\")",
+      "Read(//mnt/d/tutor-miniapp/server/src/modules/**)",
+      "Read(//d//**)",
+      "Read(//tmp/**)",
+      "Bash(npm install *)",
+      "Bash(xargs sed *)"
+    ]
+  }
+}

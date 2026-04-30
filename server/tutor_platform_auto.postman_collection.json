@@ -1,0 +1,129 @@
+{
+  "info": {
+    "name": "Tutor Platform Full Flow Auto V2",
+    "_postman_id": "c4f8d3c2-9876-4321-90ab-cdef987654aa",
+    "description": "Full CRUD & business flow for Parent/Teacher/Demand/Apply modules with automatic unique IDs and phone numbers. Fully repeatable without 404/409 errors.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Generate unique phone numbers and IDs",
+          "function randomPhone(){ return '138' + Math.floor(10000000 + Math.random()*90000000); }",
+          "pm.environment.set('parent_phone', randomPhone());",
+          "pm.environment.set('teacher_phone', randomPhone());",
+          "pm.environment.set('demand_id', Date.now());",
+          "pm.environment.set('teacher_user_id', Date.now() % 100000);"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Parent Register",
+      "request": {
+        "method": "POST",
+        "header":[{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"phone\": \"{{parent_phone}}\",\n  \"role\": \"parent\"\n}"},
+        "url":{"raw":"http://localhost:3000/api/users","protocol":"http","host":["localhost"],"port":"3000","path":["api","users"]}
+      },
+      "event":[
+        {
+          "listen":"test",
+          "script":{
+            "exec":[
+              "var jsonData = pm.response.json();",
+              "if(jsonData.success){ pm.environment.set('parent_id', jsonData.data.id); }"
+            ],
+            "type":"text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Parent Login",
+      "request": {
+        "method": "POST",
+        "header":[{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"phone\": \"{{parent_phone}}\"\n}"},
+        "url":{"raw":"http://localhost:3000/api/users/login","protocol":"http","host":["localhost"],"port":"3000","path":["api","users","login"]}
+      }
+    },
+    {
+      "name": "3. Parent Publishes Demand",
+      "request": {
+        "method": "POST",
+        "header":[{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"title\": \"Math Tutoring\",\n  \"subject\": \"Math\",\n  \"grade_level\": \"8\",\n  \"area\": \"Wuhan Hongshan\",\n  \"class_mode\": \"offline\",\n  \"description\": \"Weekend tutoring\",\n  \"contact_name\": \"Zhang\",\n  \"contact_phone\": \"13911112222\"\n}"},
+        "url":{"raw":"http://localhost:3000/api/demands","protocol":"http","host":["localhost"],"port":"3000","path":["api","demands"]}
+      }
+    },
+    {
+      "name": "4. Teacher Register",
+      "request": {
+        "method": "POST",
+        "header":[{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"phone\": \"{{teacher_phone}}\",\n  \"role\": \"teacher\"\n}"},
+        "url":{"raw":"http://localhost:3000/api/users","protocol":"http","host":["localhost"],"port":"3000","path":["api","users"]}
+      }
+    },
+    {
+      "name": "5. Teacher Creates Profile",
+      "request": {
+        "method": "POST",
+        "header":[{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"user_id\": \"{{teacher_user_id}}\",\n  \"real_name\": \"Li Ming\",\n  \"teaching_subjects\": [\"Math\",\"Physics\"]\n}"},
+        "url":{"raw":"http://localhost:3000/api/teachers","protocol":"http","host":["localhost"],"port":"3000","path":["api","teachers"]}
+      }
+    },
+    {
+      "name": "6. Teacher Views Demands",
+      "request": {
+        "method":"GET",
+        "header":[],
+        "url":{"raw":"http://localhost:3000/api/demands","protocol":"http","host":["localhost"],"port":"3000","path":["api","demands"]}
+      }
+    },
+    {
+      "name": "7. Teacher Applies",
+      "event":[
+        {
+          "listen":"test",
+          "script":{
+            "exec":[
+              "var jsonData = pm.response.json();",
+              "if(jsonData.success){ pm.environment.set('apply_id', jsonData.data.id); }"
+            ],
+            "type":"text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method":"POST",
+        "header":[{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"demand_id\": \"{{demand_id}}\",\n  \"teacher_user_id\": \"{{teacher_user_id}}\",\n  \"message\": \"我有初中数学辅导经验，想接这个需求\"\n}"},
+        "url":{"raw":"http://localhost:3000/api/applies","protocol":"http","host":["localhost"],"port":"3000","path":["api","applies"]}
+      }
+    },
+    {
+      "name": "8. Parent Lists Applications",
+      "request": {
+        "method":"GET",
+        "header":[],
+        "url":{"raw":"http://localhost:3000/api/applies?demand_id={{demand_id}}","protocol":"http","host":["localhost"],"port":"3000","path":["api","applies"],"query":[{"key":"demand_id","value":"{{demand_id}}"}]}
+      }
+    },
+    {
+      "name": "9. Parent Accepts or Rejects",
+      "request": {
+        "method":"PUT",
+        "header":[{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"status\": \"accepted\"\n}"},
+        "url":{"raw":"http://localhost:3000/api/applies/{{apply_id}}","protocol":"http","host":["localhost"],"port":"3000","path":["api","applies","{{apply_id}}"]}
+      }
+    }
+  ]
+}

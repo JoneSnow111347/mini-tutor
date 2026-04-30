@@ -1,0 +1,26 @@
+<view class="container">
+  <block wx:if="{{!selectedDemand}}">
+    <view class="ios-hero"><text class="eyebrow">申请管理</text><text class="title">选择需求</text><text class="subtitle">进入某个需求后，可实时查看老师申请并进行审批。</text></view>
+    <view wx:if="{{loading}}" class="empty-tip">正在同步需求...</view>
+    <view wx:elif="{{myDemands.length === 0}}" class="empty-tip">还没有发布过需求</view>
+    <view wx:for="{{myDemands}}" wx:key="id" class="card card-tap" data-id="{{item.id}}" bindtap="selectDemand">
+      <view class="card-row"><view class="demand-main"><text class="card-title">{{item.title}}</text><text class="card-meta">{{item.subject}} · {{item.grade_level}} · {{item.area}}</text></view><text class="badge badge-{{item.displayStatus}}">{{item.statusText}}</text></view>
+      <view class="tag-row"><text class="tag">{{item.class_mode}}</text><text class="tag">{{item.dateText}}</text></view>
+      <text class="goto-hint">查看申请 ></text>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="card selected-card"><text class="back-btn" bindtap="backToDemandList">返回需求列表</text><view class="card-row"><view class="demand-main"><text class="card-title">{{selectedDemand.title}}</text><text class="card-meta">{{selectedDemand.subject}} · {{selectedDemand.grade_level}} · {{selectedDemand.area}}</text></view><text class="badge badge-{{selectedDemand.displayStatus}} {{demandStatusChanged ? 'badge-flash' : ''}}">{{selectedDemand.statusText}}</text></view><button wx:if="{{selectedDemand.canClose}}" class="close-button" bindtap="closeDemand">关闭订单</button></view>
+    <view wx:if="{{pendingCount > 0}}" class="status-banner banner-info"><text class="status-banner-title">{{pendingCount}} 个申请待处理</text><text class="status-banner-sub">页面会每 5 秒自动同步一次新申请和状态变化。</text></view>
+    <view wx:if="{{loading}}" class="empty-tip">正在加载申请...</view>
+    <view wx:elif="{{applies.length === 0}}" class="empty-tip">暂时没有老师申请</view>
+    <view wx:for="{{applies}}" wx:key="id" class="card apply-card {{item.statusChanged ? 'card-updated' : ''}}">
+      <view class="apply-head card-tap" data-user-id="{{item.teacher_user_id}}" bindtap="goTeacherProfile"><view><text class="teacher-name">{{teacherMap[item.teacher_user_id] ? teacherMap[item.teacher_user_id].real_name : '老师 #' + item.teacher_user_id}}</text><text wx:if="{{teacherMap[item.teacher_user_id]}}" class="teacher-subjects">{{teacherMap[item.teacher_user_id].teaching_subjects}}</text></view><view class="badge-col"><text wx:if="{{teacherMap[item.teacher_user_id] && teacherMap[item.teacher_user_id].verification_status === 'verified'}}" class="badge badge-verified">已认证</text><text class="badge badge-{{item.status}} {{item.statusChanged ? 'badge-flash' : ''}}">{{item.statusText}}</text></view></view>
+      <view wx:if="{{teacherMap[item.teacher_user_id]}}" class="fav-teacher-row"><button class="fav-teacher-btn {{favTeacherMap[teacherMap[item.teacher_user_id].id] ? 'fav-teacher-active' : ''}}" data-teacher-id="{{teacherMap[item.teacher_user_id].id}}" catchtap="toggleFavTeacher">{{favTeacherMap[teacherMap[item.teacher_user_id].id] ? '已收藏老师' : '收藏此老师'}}</button><text class="goto-hint small" data-user-id="{{item.teacher_user_id}}" bindtap="goTeacherProfile">查看资料 ></text></view>
+      <text class="card-meta">申请时间：{{item.dateText}}</text>
+      <view wx:if="{{item.message}}" class="message-box"><text>{{item.message}}</text></view>
+      <view wx:if="{{item.status === 'pending'}}" class="apply-actions"><button class="btn-success btn-sm" data-apply-id="{{item.id}}" data-decision="accepted" bindtap="handleDecision">接受</button><button class="btn-danger btn-sm" data-apply-id="{{item.id}}" data-decision="rejected" bindtap="handleDecision">拒绝</button><button class="btn-secondary btn-sm detail-btn" data-apply-id="{{item.id}}" bindtap="goAcceptReject">详情</button></view>
+    </view>
+  </block>
+  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
+</view>

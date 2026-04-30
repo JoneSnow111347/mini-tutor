@@ -1,0 +1,21 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="empty-tip">正在加载老师资料...</view>
+  <block wx:elif="{{teacher}}">
+    <view class="profile-card">
+      <view class="profile-hero">
+        <view class="profile-avatar"><text class="profile-avatar-text">{{teacherInitial}}</text></view>
+        <view class="profile-hero-info"><text class="profile-name">{{teacher.real_name}}</text><view class="badge-row"><text class="badge badge-{{teacher.verification_status === 'verified' ? 'verified' : teacher.verification_status === 'rejected' ? 'rejected' : 'pending'}}">{{verificationText}}</text><text class="badge badge-open">{{teacher.is_public ? '资料公开' : '资料隐藏'}}</text></view></view>
+      </view>
+      <view class="summary-grid"><view class="summary-item"><text class="summary-value">{{acceptedOrders}}</text><text class="summary-label">已接单</text></view><view class="summary-item"><text class="summary-value">{{verificationText}}</text><text class="summary-label">认证状态</text></view></view>
+    </view>
+    <view class="card">
+      <view class="profile-row"><text class="prow-key">姓名</text><text class="prow-val">{{teacher.real_name}}</text></view>
+      <view class="profile-row"><text class="prow-key">科目</text><text class="prow-val">{{teacher.teaching_subjects}}</text></view>
+      <view class="profile-row"><text class="prow-key">手机号</text><text class="prow-val">{{phoneText}}</text></view>
+      <view class="profile-row last"><text class="prow-key">简介</text><text class="prow-val">{{bioText}}</text></view>
+    </view>
+    <button wx:if="{{!readonly}}" class="btn-primary" bindtap="goEditProfile">编辑资料</button>
+  </block>
+  <view wx:else class="empty-card"><text class="empty-title">暂无老师资料</text><text class="empty-sub">完善资料后，家长可以查看你的姓名、科目和认证状态。</text><button class="btn-primary" bindtap="goEditProfile">去完善资料</button></view>
+  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
+</view>

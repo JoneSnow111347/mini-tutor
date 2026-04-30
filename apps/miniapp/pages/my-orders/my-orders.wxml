@@ -1,0 +1,88 @@
+<view class="page">
+  <view class="ios-hero">
+    <text class="eyebrow">{{role === 'teacher' ? '教师' : '家长'}}</text>
+    <text class="title">我的订单</text>
+    <text class="subtitle">{{role === 'teacher' ? '查看所有申请记录及接单状态。' : '管理已发布需求，查看申请进度。'}}</text>
+  </view>
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'all' ? 'tab-active' : ''}}" data-tab="all" bindtap="switchTab">全部</view>
+    <view class="tab-item {{activeTab === 'favorites' ? 'tab-active' : ''}}" data-tab="favorites" bindtap="switchTab">收藏</view>
+  </view>
+  <block wx:if="{{role !== 'teacher' && activeTab === 'all'}}">
+    <view wx:if="{{loading}}" class="empty-tip">正在同步...</view>
+    <view wx:elif="{{demands.length === 0}}" class="empty-tip">还没有发布需求</view>
+    <view wx:for="{{demands}}" wx:key="id" class="card demand-card {{closingDemandId === item.id ? 'card-closing' : ''}}">
+      <view class="card-row">
+        <view class="demand-main">
+          <text class="card-title">{{item.title}}</text>
+          <text class="card-meta">{{item.subject}} · {{item.grade_level}} · {{item.class_mode}}</text>
+        </view>
+        <text class="badge badge-{{item.displayStatus}} {{item.statusChanged ? 'badge-flash' : ''}}">{{item.statusText}}</text>
+      </view>
+      <text class="card-meta">区域：{{item.area}}</text>
+      <text class="card-meta">发布：{{item.dateText}}</text>
+      <view class="demand-foot">
+        <text>申请 {{item.applicantCount}}</text>
+        <text class="warn-text">待处理 {{item.pendingCount}}</text>
+        <text class="ok-text">已接收 {{item.acceptedCount}}</text>
+      </view>
+      <view class="card-actions">
+        <button class="btn-secondary btn-sm action-btn" data-id="{{item.id}}" catchtap="showDemandDetail">查看详情</button>
+        <button class="btn-secondary btn-sm action-btn" data-id="{{item.id}}" catchtap="viewApplications">查看申请</button>
+        <button wx:if="{{item.canClose}}" class="btn-sm close-btn" data-id="{{item.id}}" catchtap="closeDemand">关闭订单</button>
+      </view>
+    </view>
+  </block>
+  <block wx:if="{{role !== 'teacher' && activeTab === 'favorites'}}">
+    <view wx:if="{{favTeachers.length === 0}}" class="empty-tip">暂无收藏老师
+在查看申请时点击收藏按钮可收藏老师</view>
+    <view wx:for="{{favTeachers}}" wx:key="id" class="card teacher-fav-card">
+      <view class="card-row card-tap" data-id="{{item.id}}" data-user-id="{{item.user_id}}" bindtap="goTeacherProfile">
+        <view class="teacher-avatar">{{item.initial}}</view>
+        <view class="teacher-fav-main">
+          <text class="card-title">{{item.real_name}}</text>
+          <text class="card-meta">{{item.teaching_subjects}}</text>
+          <text wx:if="{{item.verification_status === 'verified'}}" class="badge badge-verified">已认证</text>
+        </view>
+        <text class="section-link">查看 ></text>
+      </view>
+      <button class="btn-sm unfav-btn" data-id="{{item.id}}" catchtap="unfavTeacher">取消收藏</button>
+    </view>
+  </block>
+  <block wx:if="{{role === 'teacher' && activeTab === 'all'}}">
+    <view wx:if="{{loading}}" class="empty-tip">正在同步...</view>
+    <view wx:elif="{{applies.length === 0}}" class="empty-tip">还没有申请过任何需求</view>
+    <view wx:for="{{applies}}" wx:key="id" class="card apply-card card-tap" data-demand-id="{{item.demand_id}}" bindtap="goApplyDetail">
+      <view class="card-row">
+        <view class="demand-main">
+          <text class="card-title">{{item.demandTitle}}</text>
+          <text class="card-meta">{{item.demandSubject}} · {{item.demandArea}}</text>
+        </view>
+        <text class="badge badge-{{item.status === 'pending' ? 'applied' : item.status}} {{item.statusChanged ? 'badge-flash' : ''}}">{{item.statusText}}</text>
+      </view>
+      <view class="apply-foot">
+        <text class="tag">{{item.demandMode}}</text>
+        <text class="card-meta">申请于 {{item.dateText}}</text>
+      </view>
+      <text wx:if="{{item.status === 'accepted'}}" class="apply-hint accepted">已接受，等待家长联系 ></text>
+      <text wx:elif="{{item.status === 'rejected'}}" class="apply-hint muted">申请未通过</text>
+      <text wx:else class="apply-hint">等待审批中 ></text>
+    </view>
+  </block>
+  <block wx:if="{{role === 'teacher' && activeTab === 'favorites'}}">
+    <view wx:if="{{favDemands.length === 0}}" class="empty-tip">暂无收藏需求
+在浏览需求时点击收藏按钮可收藏</view>
+    <view wx:for="{{favDemands}}" wx:key="id" class="card fav-demand-card">
+      <view class="card-row card-tap" data-id="{{item.id}}" bindtap="goFavDemandDetail">
+        <view class="demand-main">
+          <text class="card-title">{{item.title}}</text>
+          <text class="card-meta">{{item.subject}} · {{item.grade_level}} · {{item.area}}</text>
+        </view>
+        <text class="badge badge-{{item.status === 'open' ? 'open' : 'closed'}}">{{item.statusText}}</text>
+      </view>
+      <text class="card-meta">发布：{{item.dateText}}</text>
+      <button class="btn-sm unfav-btn" data-id="{{item.id}}" catchtap="unfavDemand">取消收藏</button>
+    </view>
+  </block>
+  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
+</view>

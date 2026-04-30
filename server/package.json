@@ -1,0 +1,17 @@
+{
+  "name": "tutor-miniapp-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal Express backend scaffold for tutor miniapp",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.22.1",
+    "sequelize": "^6.37.8"
+  }
+}
