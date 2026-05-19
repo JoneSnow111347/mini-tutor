@@ -76,8 +76,7 @@
       </view>
     </view>
 
+    <view class="logout-divider"></view>
     <button class="btn-secondary logout-btn" bindtap="handleLogout">退出登录</button>
   </block>
-
-  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

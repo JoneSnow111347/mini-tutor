@@ -245,7 +245,7 @@ Page({
   },
 
   goProfile() {
-    wx.navigateTo({ url: '/pages/teacher-profile/teacher-profile' })
+    wx.navigateTo({ url: '/pages/my/my' })
   },
 
   goEditTeacher() {

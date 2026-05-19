@@ -88,6 +88,4 @@
       </view>
     </view>
   </block>
-
-  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

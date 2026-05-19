@@ -95,7 +95,7 @@ Page({
           applicantCount: rel.length,
           pendingCount:   rel.filter(a => a.status === 'pending').length,
           acceptedCount,
-          canClose:       display.displayStatus === 'accepted',
+          canClose:       d.status !== 'closed',
           statusChanged:  !!(prevStatus && prevStatus !== display.displayStatus),
         }
       })

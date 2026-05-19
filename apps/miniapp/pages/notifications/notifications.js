@@ -14,6 +14,18 @@ const TYPE_BADGE = {
   apply_rejected:  'badge-rejected',
 }
 
+const APPLY_STATUS_TEXT = {
+  pending: '待处理',
+  accepted: '已接受',
+  rejected: '已拒绝',
+}
+
+const APPLY_STATUS_BADGE = {
+  pending: 'badge-applied',
+  accepted: 'badge-accepted',
+  rejected: 'badge-rejected',
+}
+
 const TYPE_STATUS_TEXT = {
   apply_submitted: '待处理',
   apply_accepted:  '已接单',
@@ -60,19 +72,31 @@ Page({
     try {
       const res = await api.getMessages({ user_id: userId }, true)
       const msgs = res.data || []
+      let applyStatusById = {}
 
-      const raw = msgs.map(m => ({
+      try {
+        const appliesRes = await api.listApplies({}, true)
+        applyStatusById = (appliesRes.data || []).reduce((acc, item) => {
+          if (item && item.id) acc[item.id] = item.status
+          return acc
+        }, {})
+      } catch (_) {}
+
+      const raw = msgs.map(m => {
+        const currentStatus = m.apply_id ? applyStatusById[m.apply_id] : ''
+        return {
         id:         m.id,
         applyId:    m.apply_id,
         demandId:   m.demand_id,
         type:       m.type,
         title:      (TYPE_TITLE[m.type] || {})[role] || m.type,
         body:       m.content,
-        statusText: TYPE_STATUS_TEXT[m.type] || '',
-        badgeClass: TYPE_BADGE[m.type] || 'badge-open',
+        statusText: currentStatus ? (APPLY_STATUS_TEXT[currentStatus] || TYPE_STATUS_TEXT[m.type] || '') : (TYPE_STATUS_TEXT[m.type] || ''),
+        badgeClass: currentStatus ? (APPLY_STATUS_BADGE[currentStatus] || TYPE_BADGE[m.type] || 'badge-open') : (TYPE_BADGE[m.type] || 'badge-open'),
         timeText:   m.createdAt ? m.createdAt.slice(0, 10) : '',
         unread:     !m.is_read,
-      }))
+        }
+      })
 
       const ids = raw.map(n => n.id).join('|')
       const changed = !!(this._lastIds && this._lastIds !== ids)

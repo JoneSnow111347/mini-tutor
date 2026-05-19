@@ -81,5 +81,4 @@
       {{item.isFav ? '已收藏' : '收藏此需求'}}
     </button>
   </view>
-  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

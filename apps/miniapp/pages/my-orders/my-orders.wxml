@@ -1,7 +1,7 @@
 <view class="page">
   <view class="ios-hero">
     <text class="eyebrow">{{role === 'teacher' ? '教师' : '家长'}}</text>
-    <text class="title">我的订单</text>
+    <text class="title">{{role === 'teacher' ? '我的申请' : '我的订单'}}</text>
     <text class="subtitle">{{role === 'teacher' ? '查看所有申请记录及接单状态。' : '管理已发布需求，查看申请进度。'}}</text>
   </view>
   <view class="tab-bar">
@@ -95,5 +95,4 @@
       <button class="btn-sm unfav-btn" data-id="{{item.id}}" catchtap="unfavDemand">取消收藏</button>
     </view>
   </block>
-  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

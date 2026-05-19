@@ -10,5 +10,4 @@
     <view class="notif-row"><view class="notif-icon-wrap {{item.type === 'apply_accepted' ? 'icon-accepted' : item.type === 'apply_rejected' ? 'icon-rejected' : 'icon-pending'}}"><text class="notif-icon">{{item.type === 'apply_accepted' ? '成' : item.type === 'apply_rejected' ? '拒' : '!'}}</text></view><view class="notif-main"><text class="notif-title">{{item.title}}</text><text class="notif-body">{{item.body}}</text></view><view class="notif-right"><text class="badge {{item.badgeClass}}">{{item.statusText}}</text><text class="notif-time">{{item.timeText}}</text></view></view>
     <view wx:if="{{item.unread}}" class="unread-dot"></view>
   </view>
-  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

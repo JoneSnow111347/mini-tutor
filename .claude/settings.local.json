@@ -22,7 +22,9 @@
       "Read(//d//**)",
       "Read(//tmp/**)",
       "Bash(npm install *)",
-      "Bash(xargs sed *)"
+      "Bash(xargs sed *)",
+      "PowerShell(Get-ChildItem \"D:\\\\tutor-miniapp\" -Depth 0 | ForEach-Object { \"$\\($_.Mode\\) $\\($_.Name\\)\" })",
+      "PowerShell(Get-ChildItem \"D:\\\\tutor-miniapp\\\\server\" -Depth 0 | ForEach-Object { \"$\\($_.Mode\\) $\\($_.Name\\)\" })"
     ]
   }
 }

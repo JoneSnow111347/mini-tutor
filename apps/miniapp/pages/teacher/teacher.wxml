@@ -37,8 +37,7 @@
   <view wx:for="{{filteredDemands}}" wx:key="id" class="card demand-card {{leavingDemandIds[item.id] ? 'card-leaving' : ''}} {{item.statusChanged ? 'card-updated' : ''}}">
     <view class="card-row card-tap" data-id="{{item.id}}" bindtap="goDemandDetail"><view class="demand-main"><text class="card-title">{{item.title}}</text><text class="card-meta">{{item.subject}} · {{item.grade_level}} · {{item.area}}</text></view><text class="badge badge-{{item.applyStatus === 'none' ? 'open' : item.applyStatus === 'pending' ? 'applied' : item.applyStatus}} {{item.statusChanged ? 'badge-flash' : ''}}">{{item.applyText}}</text></view>
     <text class="desc">{{item.description}}</text>
-    <view class="demand-foot"><text>{{item.class_mode}}</text><text>{{item.dateText}}</text><button wx:if="{{item.applyStatus === 'none'}}" class="apply-button" data-id="{{item.id}}" catchtap="goDemandDetail">申请接单</button><text wx:else class="foot-status-link" data-id="{{item.id}}" catchtap="goDemandDetail">查看申请 ></text></view>
+    <view class="demand-foot"><text>{{item.class_mode}}</text><text>{{item.dateText}}</text><button wx:if="{{item.applyStatus === 'none'}}" class="apply-button" data-id="{{item.id}}" catchtap="goDemandDetail">申请接单</button><text wx:else class="foot-status-link" data-id="{{item.id}}" catchtap="goDemandDetail">查看详情</text></view>
     <view class="fav-row"><button class="fav-btn {{item.isFav ? 'fav-active' : ''}}" data-id="{{item.id}}" catchtap="toggleFavDemand">{{item.isFav ? '已收藏' : '收藏'}}</button></view>
   </view>
-  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

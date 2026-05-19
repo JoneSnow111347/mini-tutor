@@ -107,7 +107,9 @@
 }
 
 .nav-orders .nav-icon-wrap {
-  background: rgba(0, 168, 122, 0.12);
+  width: 56rpx;
+  height: 56rpx;
+  background: rgba(0, 168, 122, 0.18);
 }
 
 .nav-icon {
@@ -118,7 +120,7 @@
 
 .nav-messages .nav-icon { color: #6B5DC6; }
 .nav-browse .nav-icon { color: #E87A3A; }
-.nav-orders .nav-icon { color: #00875A; }
+.nav-orders .nav-icon { font-size: 28rpx; color: #00875A; }
 
 .nav-label {
   font-size: 22rpx;
