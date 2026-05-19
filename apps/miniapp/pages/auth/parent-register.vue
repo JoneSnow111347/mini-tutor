@@ -40,7 +40,19 @@ async function handleRegister() {
       role:     'parent',
       nickname: nickname.value.trim() || null,
     })
-    saveSession(res.data)
+
+    const user = res.data
+    // Role guard: ensure backend returned the expected role
+    if (user.role !== 'parent' && user.role !== 'both') {
+      wx.showModal({
+        title: '注册异常',
+        content: '服务端返回了意外的身份类型，请重试或联系客服',
+        showCancel: false,
+      })
+      return
+    }
+
+    saveSession(user)
     wx.showToast({ title: '注册成功', icon: 'success' })
     setTimeout(() => wx.reLaunch({ url: '/pages/parent/home' }), 800)
   } catch (err) {

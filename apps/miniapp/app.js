@@ -33,7 +33,10 @@ App({
     this.globalData.userId    = userInfo.id
     this.globalData.role      = userInfo.role
     const tid = wx.getStorageSync('teacherId')
-    this.globalData.teacherId = tid ? Number(tid) : null
+    this.globalData.teacherId = ['teacher', 'both'].includes(userInfo.role) && tid ? Number(tid) : null
+    if (!['teacher', 'both'].includes(userInfo.role)) {
+      wx.removeStorageSync('teacherId')
+    }
     if (userInfo.id) this.loadFavorites(userInfo.id)
   },
 
@@ -47,8 +50,8 @@ App({
     this.globalData.lastBrowseDemandsTime = 0
     this.globalData.newDemandsCount       = 0
     wx.setStorageSync('userInfo', user)
-    if (user.token) wx.setStorageSync('token', user.token)
     if (teacherId) wx.setStorageSync('teacherId', teacherId)
+    else wx.removeStorageSync('teacherId')
     this.loadFavorites(user.id)
   },
 
@@ -142,7 +145,7 @@ App({
     try {
       const { api } = require('./utils/request')
       const dr = await api.listDemands(true)
-      const myDemandIds = (dr.data || []).filter(d => d.user_id === uid).map(d => d.id)
+      const myDemandIds = (dr.data || []).filter(d => Number(d.user_id) === Number(uid)).map(d => d.id)
       if (myDemandIds.length === 0) { this.globalData.pendingCount = 0; return 0 }
       const ar = await api.listApplies({}, true)
       const count = (ar.data || []).filter(a => myDemandIds.includes(a.demand_id) && a.status === 'pending').length

@@ -1,18 +1,19 @@
 const { confirmLogout } = require('../../utils/page')
-const { api } = require('../../utils/request')
+const { api, normalizeErrorMessage } = require('../../utils/request')
 
 const POLL_INTERVAL_MS = 5000
 
 function text(key) {
   return {
-    pending: '\u5f85\u5904\u7406',
-    accepted: '\u5df2\u63a5\u5355',
-    rejected: '\u672a\u901a\u8fc7',
-    invalidParams: '\u53c2\u6570\u9519\u8bef',
-    alreadyApplied: '\u60a8\u5df2\u7533\u8bf7\u8fc7\u8be5\u9700\u6c42',
-    applySuccess: '\u7533\u8bf7\u6210\u529f\uff0c\u7b49\u5f85\u5bb6\u957f\u5ba1\u6838',
-    acceptedToast: '\u606d\u559c\uff0c\u60a8\u7684\u7533\u8bf7\u5df2\u88ab\u63a5\u53d7',
-    rejectedToast: '\u7533\u8bf7\u672a\u901a\u8fc7\uff0c\u60a8\u53ef\u4ee5\u7ee7\u7eed\u7533\u8bf7\u5176\u4ed6\u9700\u6c42',
+    pending: '待处理',
+    accepted: '已接单',
+    rejected: '未通过',
+    invalidParams: '参数错误',
+    alreadyApplied: '您已申请过该需求',
+    applySuccess: '申请成功，等待家长审核',
+    acceptedToast: '恭喜，您的申请已被接受',
+    rejectedToast: '申请未通过，您可以继续申请其他需求',
+    notVerified: '仅已认证老师可以申请需求',
   }[key]
 }
 
@@ -25,6 +26,8 @@ Page({
     alreadyApplied: false,
     applyStatus: null,
     myApply: null,
+    teacherProfile: null,
+    canApply: false,
   },
 
   _pollTimer: null,
@@ -63,12 +66,23 @@ Page({
   async _loadData() {
     this.setData({ loading: true })
     try {
-      const dr = await api.getDemand(this._demandId)
-      this.setData({ demand: dr.data })
-
       const userId = getApp().globalData.userId
-      const ar = await api.listApplies({ teacher_user_id: userId })
-      const myApply = ar.data.find(a => a.demand_id === this._demandId)
+      const [demandRes, appliesRes, teachersRes] = await Promise.all([
+        api.getDemand(this._demandId),
+        api.listApplies({ teacher_user_id: userId }, true),
+        api.listTeachers(true),
+      ])
+
+      const demand = demandRes.data
+      const myApply = (appliesRes.data || []).find((item) => Number(item.demand_id) === Number(this._demandId))
+      const teacherProfile = (teachersRes.data || []).find((item) => Number(item.user_id) === Number(userId)) || null
+      const canApply = !!teacherProfile && teacherProfile.verification_status === 'verified'
+
+      this.setData({
+        demand,
+        teacherProfile,
+        canApply,
+      })
 
       if (myApply) {
         this.setData({
@@ -82,7 +96,8 @@ Page({
       } else {
         this.setData({ alreadyApplied: false, applyStatus: null, myApply: null })
       }
-    } catch (_) {
+    } catch (error) {
+      wx.showToast({ title: normalizeErrorMessage(error, '加载失败，请重试'), icon: 'none' })
     } finally {
       this.setData({ loading: false })
     }
@@ -92,7 +107,27 @@ Page({
     this.setData({ message: e.detail.value })
   },
 
+  openDemandLocation() {
+    const { demand } = this.data
+    if (!demand || demand.latitude === null || demand.longitude === null || demand.latitude === undefined || demand.longitude === undefined) {
+      wx.showToast({ title: '该需求未填写地图位置', icon: 'none' })
+      return
+    }
+
+    wx.openLocation({
+      latitude: Number(demand.latitude),
+      longitude: Number(demand.longitude),
+      name: demand.title || '家教需求位置',
+      address: demand.address || demand.area || '',
+      scale: 16,
+    })
+  },
+
   async handleApply() {
+    if (!this.data.canApply) {
+      wx.showToast({ title: text('notVerified'), icon: 'none' })
+      return
+    }
     if (this.data.alreadyApplied) {
       wx.showToast({ title: text('alreadyApplied'), icon: 'none' })
       return
@@ -102,7 +137,6 @@ Page({
     try {
       const res = await api.createApply({
         demand_id: this._demandId,
-        teacher_user_id: getApp().globalData.userId,
         message: this.data.message.trim() || null,
       })
 
@@ -113,10 +147,14 @@ Page({
       })
       wx.showToast({ title: text('applySuccess'), icon: 'success', duration: 2000 })
       this._startPolling()
-    } catch (err) {
-      const msg = (err && err.message) || ''
-      if (msg.includes('Already applied') || msg.includes(text('alreadyApplied'))) {
+    } catch (error) {
+      const message = normalizeErrorMessage(error, '申请失败，请重试')
+      if (message.includes('Only verified teachers')) {
+        wx.showToast({ title: text('notVerified'), icon: 'none' })
+      } else if (message.includes('Already applied')) {
         this.setData({ alreadyApplied: true, applyStatus: 'pending' })
+      } else {
+        wx.showToast({ title: message, icon: 'none' })
       }
     } finally {
       this.setData({ submitting: false })
@@ -141,8 +179,7 @@ Page({
     try {
       const userId = getApp().globalData.userId
       const ar = await api.listApplies({ teacher_user_id: userId }, true)
-      const myApply = ar.data.find(a => a.demand_id === this._demandId)
-
+      const myApply = (ar.data || []).find((item) => Number(item.demand_id) === Number(this._demandId))
       if (!myApply) return
 
       const prevStatus = this.data.applyStatus
@@ -159,11 +196,7 @@ Page({
           status: 'accepted',
           demandTitle: (this.data.demand && this.data.demand.title) || '',
         })
-        wx.showToast({
-          title: text('acceptedToast'),
-          icon: 'success',
-          duration: 3000,
-        })
+        wx.showToast({ title: text('acceptedToast'), icon: 'success', duration: 3000 })
       } else if (newStatus === 'rejected') {
         this._stopPolling()
         getApp().addStudentNotification({
@@ -172,17 +205,16 @@ Page({
           status: 'rejected',
           demandTitle: (this.data.demand && this.data.demand.title) || '',
         })
-        wx.showToast({
-          title: text('rejectedToast'),
-          icon: 'none',
-          duration: 3000,
-        })
+        wx.showToast({ title: text('rejectedToast'), icon: 'none', duration: 3000 })
       }
-    } catch (_) {
-    }
+    } catch (_) {}
   },
 
   handleGlobalLogout() {
     confirmLogout(this)
+  },
+
+  goEditTeacher() {
+    wx.navigateTo({ url: '/pages/teacher-profile/edit-teacher' })
   },
 })

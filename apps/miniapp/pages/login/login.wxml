@@ -1,28 +1,53 @@
 <view class="page login-page">
   <view class="login-hero">
-    <view class="app-mark">武</view>
-    <text class="title">武汉家教</text>
-    <text class="subtitle">家长发布需求，教师浏览接单。先选择身份，再登录进入小程序。</text>
+    <view class="hero-illustration-wrap">
+      <image class="hero-illustration" src="/assets/images/hero/login-hero.png" mode="aspectFill" />
+    </view>
+    <view class="hero-brand">
+      <view class="app-mark">家</view>
+      <view class="hero-copy">
+        <text class="title">找家教，上这里就够了</text>
+        <text class="subtitle">武汉本地家教，家长老师直接对接</text>
+      </view>
+    </view>
   </view>
 
   <view class="card login-card">
+    <view class="card-head">
+      <view>
+        <text class="card-title">登录</text>
+        <text class="card-subtitle">输入手机号和密码</text>
+      </view>
+      <view class="card-chip">{{role === 'teacher' ? '教师端' : '家长端'}}</view>
+    </view>
+
     <view class="role-group">
       <button class="role-button {{role === 'parent' ? 'role-active' : ''}}" data-role="parent" bindtap="selectRole">
-        家长 / 学生
+        <text class="role-mark">家</text>
+        <text class="role-title">我是家长</text>
       </button>
       <button class="role-button {{role === 'teacher' ? 'role-active' : ''}}" data-role="teacher" bindtap="selectRole">
-        教师
+        <text class="role-mark">师</text>
+        <text class="role-title">我是老师</text>
       </button>
     </view>
 
-    <view class="form-group">
-      <text class="form-label">手机号<text class="required">*</text></text>
-      <input class="form-input" type="number" maxlength="11" placeholder="请输入手机号" placeholder-class="placeholder" value="{{phone}}" bindinput="onPhoneInput" />
-    </view>
+    <view class="form-panel">
+      <view class="form-group">
+        <text class="form-label">手机号<text class="required">*</text></text>
+        <view class="input-shell">
+          <text class="input-prefix">+86</text>
+          <input class="form-input login-input" type="number" maxlength="11" placeholder="请输入手机号" placeholder-class="placeholder" value="{{phone}}" bindinput="onPhoneInput" />
+        </view>
+      </view>
 
-    <view class="form-group">
-      <text class="form-label">密码<text class="required">*</text></text>
-      <input class="form-input" password maxlength="24" placeholder="至少 6 位" placeholder-class="placeholder" value="{{password}}" bindinput="onPasswordInput" bindconfirm="handleLogin" />
+      <view class="form-group">
+        <text class="form-label">密码<text class="required">*</text></text>
+        <view class="input-shell">
+          <text class="input-prefix">•••</text>
+          <input class="form-input login-input" password maxlength="24" placeholder="请输入至少 6 位密码" placeholder-class="placeholder" value="{{password}}" bindinput="onPasswordInput" bindconfirm="handleLogin" />
+        </view>
+      </view>
     </view>
 
     <view wx:if="{{message}}" class="feedback {{feedbackType}}">
@@ -30,9 +55,12 @@
     </view>
 
     <button class="btn-primary login-button" loading="{{loading}}" disabled="{{loading}}" bindtap="handleLogin">
-      {{loading ? '登录中...' : '登录'}}
+      {{loading ? '登录中...' : '立即登录'}}
     </button>
 
-    <button class="register-link" bindtap="goRegister">没有账号？点击注册</button>
+    <view class="login-footer">
+      <text class="footer-tip">还没有账号？</text>
+      <button class="register-link" bindtap="goRegister">创建新账号</button>
+    </view>
   </view>
 </view>

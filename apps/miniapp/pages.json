@@ -1,9 +1,15 @@
 {
   "pages": [
     {
-      "path": "pages/index/index",
+      "path": "pages/login/login",
       "style": {
-        "navigationBarTitleText": "\u6b66\u6c49\u5bb6\u6559"
+        "navigationBarTitleText": "\u767b\u5f55"
+      }
+    },
+    {
+      "path": "pages/register/register",
+      "style": {
+        "navigationBarTitleText": "\u6ce8\u518c"
       }
     },
     {

@@ -7,8 +7,8 @@ const VALID_STATUSES = ['pending', 'accepted', 'rejected'];
 
 async function listApplies(filter = {}) {
   const where = {};
-  if (filter.demand_id        !== undefined) where.demand_id        = filter.demand_id;
-  if (filter.teacher_user_id  !== undefined) where.teacher_user_id  = filter.teacher_user_id;
+  if (filter.demand_id !== undefined) where.demand_id = filter.demand_id;
+  if (filter.teacher_user_id !== undefined) where.teacher_user_id = filter.teacher_user_id;
   return Apply.findAll({ where });
 }
 
@@ -24,7 +24,7 @@ async function getApplyById(id) {
 
 async function createApply(data) {
   const missing = [];
-  if (!data.demand_id)       missing.push('demand_id');
+  if (!data.demand_id) missing.push('demand_id');
   if (!data.teacher_user_id) missing.push('teacher_user_id');
   if (missing.length > 0) {
     const err = new Error('Missing required fields');
@@ -34,7 +34,7 @@ async function createApply(data) {
   }
 
   const existing = await Apply.findOne({
-    where: { demand_id: data.demand_id, teacher_user_id: data.teacher_user_id }
+    where: { demand_id: data.demand_id, teacher_user_id: data.teacher_user_id },
   });
   if (existing) {
     const err = new Error('Already applied to this demand');
@@ -42,32 +42,42 @@ async function createApply(data) {
     throw err;
   }
 
+  const demand = await Demand.findByPk(data.demand_id);
+  if (!demand) {
+    const err = new Error('Demand not found');
+    err.status = 404;
+    throw err;
+  }
+
+  if (demand.status !== 'open') {
+    const err = new Error('This demand is no longer open');
+    err.status = 409;
+    throw err;
+  }
+
   const apply = await Apply.create({
-    demand_id:       data.demand_id,
+    demand_id: data.demand_id,
     teacher_user_id: data.teacher_user_id,
-    message:         data.message || null,
-    status:          'pending'
+    message: data.message || null,
+    status: 'pending',
   });
 
-  // Notify teacher that submission was received
-  const demand = await Demand.findByPk(data.demand_id);
-  const demandTitle = demand ? demand.title : `需求 #${data.demand_id}`;
+  const demandTitle = demand.title || `Demand #${data.demand_id}`;
   msgSvc.createMessage({
-    user_id:  data.teacher_user_id,
-    type:     'apply_submitted',
+    user_id: data.teacher_user_id,
+    type: 'apply_submitted',
     apply_id: apply.id,
     demand_id: data.demand_id,
-    content:  `你已成功申请《${demandTitle}》，等待家长审核。`
+    content: `Your application for "${demandTitle}" has been submitted and is awaiting review.`,
   }).catch(() => {});
 
-  // Notify demand owner (parent) that a new application arrived
-  if (demand) {
+  if (demand.user_id) {
     msgSvc.createMessage({
-      user_id:  demand.user_id,
-      type:     'apply_submitted',
+      user_id: demand.user_id,
+      type: 'apply_submitted',
       apply_id: apply.id,
       demand_id: data.demand_id,
-      content:  `你的需求《${demandTitle}》收到了一条新申请。`
+      content: `Your demand "${demandTitle}" received a new teacher application.`,
     }).catch(() => {});
   }
 
@@ -91,19 +101,19 @@ async function updateApplyStatus(id, status) {
   apply.status = status;
   await apply.save();
 
-  // Notify teacher of the decision
   const demand = await Demand.findByPk(apply.demand_id);
-  const demandTitle = demand ? demand.title : `需求 #${apply.demand_id}`;
+  const demandTitle = demand ? (demand.title || `Demand #${apply.demand_id}`) : `Demand #${apply.demand_id}`;
   const msgType = status === 'accepted' ? 'apply_accepted' : 'apply_rejected';
   const msgContent = status === 'accepted'
-    ? `你对《${demandTitle}》的申请已被接受，等待家长联系你。`
-    : `你对《${demandTitle}》的申请未通过。`;
+    ? `Your application for "${demandTitle}" has been accepted.`
+    : `Your application for "${demandTitle}" was not accepted.`;
+
   msgSvc.createMessage({
-    user_id:  apply.teacher_user_id,
-    type:     msgType,
+    user_id: apply.teacher_user_id,
+    type: msgType,
     apply_id: apply.id,
     demand_id: apply.demand_id,
-    content:  msgContent
+    content: msgContent,
   }).catch(() => {});
 
   return apply;

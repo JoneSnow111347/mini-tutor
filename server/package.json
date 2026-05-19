@@ -6,11 +6,17 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "migrate": "node src/scripts/migrate.js",
+    "pm2:start": "pm2 start ecosystem.config.js --env production",
+    "pm2:restart": "pm2 restart tutor-miniapp-server --update-env",
+    "pm2:stop": "pm2 stop tutor-miniapp-server"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
     "mysql2": "^3.22.1",
     "sequelize": "^6.37.8"
   }

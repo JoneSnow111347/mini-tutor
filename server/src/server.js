@@ -1,27 +1,35 @@
 'use strict';
 
-const express = require('express');
-const routes = require('./routes');
+require('./load-env')();
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const app = require('./app');
+const { sequelize, formatDatabaseStartupError } = require('./db');
 
-app.use(express.json());
+const APP_PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Server is running' });
-});
+async function start() {
+  try {
+    await sequelize.authenticate();
+    console.log('Database connected');
 
-app.use('/api', routes);
+    await sequelize.sync({ alter: true });
+    console.log('DB synced');
 
-const { sequelize } = require('./db');
+    app.listen(APP_PORT, () => {
+      console.log(`Server listening on http://localhost:${APP_PORT}`);
+    });
+  } catch (err) {
+    const hints = formatDatabaseStartupError(err);
+    if (hints) {
+      for (const line of hints) {
+        console.error(line);
+      }
+    }
+    console.error('DB connection failed:', err.message);
+    process.exit(1);
+  }
+}
 
-sequelize.sync({ alter: true }).then(() => {
-  console.log('DB synced');
-});
+start();
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
-
-module.exports = app;
+module.exports = { app, sequelize };

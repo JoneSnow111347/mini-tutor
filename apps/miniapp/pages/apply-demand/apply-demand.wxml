@@ -9,11 +9,28 @@
         <text class="tag">{{demand.grade_level}}</text>
         <text class="tag">{{demand.class_mode}}</text>
       </view>
+
       <view class="detail-row">
         <text class="detail-key">上课区域</text>
         <text class="detail-val">{{demand.area}}</text>
       </view>
+
+      <view wx:if="{{demand.address}}" class="detail-row">
+        <text class="detail-key">详细地址</text>
+        <text class="detail-val">{{demand.address}}</text>
+      </view>
+
+      <button wx:if="{{demand.latitude !== null && demand.latitude !== undefined && demand.longitude !== null && demand.longitude !== undefined}}" class="btn-secondary map-btn" bindtap="openDemandLocation">
+        打开地图位置
+      </button>
+
       <text class="desc-block">{{demand.description}}</text>
+    </view>
+
+    <view wx:if="{{!canApply}}" class="status-banner banner-warning">
+      <text class="status-banner-title">暂不可申请</text>
+      <text class="status-banner-sub">只有已认证老师可以申请家长需求，请先完善资料并完成认证。</text>
+      <button class="banner-cta" bindtap="goEditTeacher">去完善资料</button>
     </view>
 
     <view wx:if="{{applyStatus === 'accepted'}}" class="status-banner banner-success">
@@ -23,12 +40,12 @@
 
     <view wx:elif="{{applyStatus === 'rejected'}}" class="status-banner banner-danger">
       <text class="status-banner-title">申请未通过</text>
-      <text class="status-banner-sub">你可以继续申请其他合适的需求。</text>
+      <text class="status-banner-sub">没关系，可以继续申请其他需求。</text>
     </view>
 
     <view wx:elif="{{alreadyApplied}}" class="status-banner banner-info">
       <text class="status-banner-title">申请已提交，等待家长审核</text>
-      <text class="status-banner-sub">页面会每 5 秒自动同步一次状态。</text>
+      <text class="status-banner-sub">有结果后会第一时间通知你。</text>
     </view>
 
     <block wx:else>
@@ -37,7 +54,7 @@
         <textarea class="form-textarea" maxlength="300" placeholder="简单介绍你的教学经验和优势" placeholder-class="placeholder" value="{{message}}" bindinput="onMessageInput" />
         <text class="char-count">{{message.length}} / 300</text>
       </view>
-      <button class="btn-primary" disabled="{{submitting}}" loading="{{submitting}}" bindtap="handleApply">
+      <button class="btn-primary" disabled="{{submitting || !canApply}}" loading="{{submitting}}" bindtap="handleApply">
         {{submitting ? '提交中...' : '申请接单'}}
       </button>
     </block>

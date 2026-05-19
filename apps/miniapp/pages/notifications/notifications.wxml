@@ -1,8 +1,11 @@
 <view class="page">
   <view class="notif-head"><view><text class="eyebrow">{{role === 'teacher' ? '教师' : '家长'}}</text><text class="title">消息通知</text><text class="subtitle">{{role === 'teacher' ? '申请审批结果将在此显示。' : '有老师申请时将在此提醒。'}}</text></view><view wx:if="{{unreadCount > 0}}" class="unread-pill {{newBadge ? 'badge-flash-anim' : ''}}">{{unreadCount > 99 ? '99+' : unreadCount}} 条未读</view></view>
-  <button wx:if="{{unreadCount > 0}}" class="read-button" bindtap="markAllRead">全部标为已读</button>
+  <text wx:if="{{unreadCount > 0}}" class="read-link" bindtap="markAllRead">全部已读</text>
   <view wx:if="{{loading}}" class="empty-tip">正在加载通知...</view>
-  <view wx:elif="{{notifications.length === 0}}" class="empty-tip">暂无通知消息</view>
+  <view wx:elif="{{notifications.length === 0}}" class="empty-tip">
+    <text class="empty-main">暂无通知</text>
+    <text class="empty-sub">{{role === 'teacher' ? '申请审批结果会在这里通知你' : '老师申请时会在这里提醒你'}}</text>
+  </view>
   <view wx:for="{{notifications}}" wx:key="id" class="card notif-card {{item.unread ? 'notif-unread' : ''}} card-tap" data-apply-id="{{item.applyId}}" data-demand-id="{{item.demandId}}" bindtap="goApplyDetail">
     <view class="notif-row"><view class="notif-icon-wrap {{item.type === 'apply_accepted' ? 'icon-accepted' : item.type === 'apply_rejected' ? 'icon-rejected' : 'icon-pending'}}"><text class="notif-icon">{{item.type === 'apply_accepted' ? '成' : item.type === 'apply_rejected' ? '拒' : '!'}}</text></view><view class="notif-main"><text class="notif-title">{{item.title}}</text><text class="notif-body">{{item.body}}</text></view><view class="notif-right"><text class="badge {{item.badgeClass}}">{{item.statusText}}</text><text class="notif-time">{{item.timeText}}</text></view></view>
     <view wx:if="{{item.unread}}" class="unread-dot"></view>

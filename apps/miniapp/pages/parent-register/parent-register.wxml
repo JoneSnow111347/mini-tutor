@@ -12,6 +12,6 @@
     <text class="form-label">昵称（可选）</text>
     <input class="form-input" type="text" maxlength="20" placeholder="请输入昵称" value="{{nickname}}" bindinput="onNicknameInput" />
   </view>
-  <button class="btn-primary" disabled="{{loading}}" bindtap="handleRegister">{{loading ? '注册中...' : '注册'}}</button>
+  <button class="btn-primary" loading="{{loading}}" disabled="{{loading}}" bindtap="handleRegister">{{loading ? '注册中...' : '注册'}}</button>
   <text class="link-text" bindtap="goLogin">已有账号？直接登录</text>
 </view>

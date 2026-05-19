@@ -1,14 +1,14 @@
 const { confirmLogout } = require('../../utils/page')
 const { api } = require('../../utils/request')
 
-const ALL = '\u5168\u90E8'
+const ALL = '全部'
 const POLL_INTERVAL_MS = 5000
 
 function applyText(status) {
   return {
-    pending: '\u5DF2\u7533\u8BF7',
-    accepted: '\u5DF2\u63A5\u5355',
-    rejected: '\u672A\u901A\u8FC7',
+    pending: '已申请',
+    accepted: '已接单',
+    rejected: '未通过',
   }[status] || ''
 }
 
@@ -18,6 +18,22 @@ function shouldShowDemand(demand, myStatus, acceptedDemandIds) {
   return !myStatus || myStatus === 'pending'
 }
 
+function formatDistance(meters) {
+  if (meters === null || meters === undefined) return ''
+  if (meters < 1000) return `${Math.round(meters)}m`
+  return `${(meters / 1000).toFixed(1)}km`
+}
+
+function calcDistance(lat1, lng1, lat2, lng2) {
+  const toRad = (value) => value * Math.PI / 180
+  const earthRadius = 6371000
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * earthRadius * Math.asin(Math.sqrt(a))
+}
+
 Page({
   data: {
     allOpenDemands: [],
@@ -25,7 +41,7 @@ Page({
     appliedSet: {},
     newDemandIds: {},
     teacherSummary: null,
-    teacherInitial: '\u5E08',
+    teacherInitial: '师',
     isFavTeacher: false,
     subjects: [ALL],
     areas: [ALL],
@@ -35,14 +51,17 @@ Page({
     syncTip: '',
     leavingDemandIds: {},
     loading: false,
+    locationReady: false,
   },
 
   _prevBrowseTime: 0,
   _pollTimer: null,
+  _currentLocation: null,
 
   onShow() {
     const app = getApp()
     this._prevBrowseTime = app.globalData.lastBrowseDemandsTime
+    this.ensureLocation()
     this.loadDemands().then(() => {
       app.setLastBrowseDemandsTime()
       app.markAllNotificationsRead()
@@ -60,8 +79,57 @@ Page({
   },
 
   async onPullDownRefresh() {
+    await this.ensureLocation()
     await this.loadDemands()
     wx.stopPullDownRefresh()
+  },
+
+  ensureLocation() {
+    if (this._currentLocation) return Promise.resolve(this._currentLocation)
+    return new Promise((resolve) => {
+      wx.getLocation({
+        type: 'gcj02',
+        success: (res) => {
+          this._currentLocation = {
+            latitude: res.latitude,
+            longitude: res.longitude,
+          }
+          this.setData({ locationReady: true })
+          resolve(this._currentLocation)
+        },
+        fail: () => resolve(null),
+      })
+    })
+  },
+
+  decorateDemand(demand, appliedSet, newDemandIds, isFav) {
+    let distanceText = ''
+    if (
+      this._currentLocation
+      && demand.latitude !== null
+      && demand.latitude !== undefined
+      && demand.longitude !== null
+      && demand.longitude !== undefined
+    ) {
+      const meters = calcDistance(
+        this._currentLocation.latitude,
+        this._currentLocation.longitude,
+        Number(demand.latitude),
+        Number(demand.longitude)
+      )
+      distanceText = formatDistance(meters)
+    }
+
+    return {
+      ...demand,
+      dateText: demand.createdAt ? demand.createdAt.slice(0, 10) : '',
+      applyStatus: appliedSet[demand.id] || '',
+      applyText: applyText(appliedSet[demand.id]),
+      isFav,
+      newTag: !!newDemandIds[demand.id],
+      distanceText,
+      hasLocation: demand.latitude !== null && demand.latitude !== undefined && demand.longitude !== null && demand.longitude !== undefined,
+    }
   },
 
   async loadDemands(background = false) {
@@ -71,48 +139,44 @@ Page({
       return
     }
     if (!background) this.setData({ loading: true })
+
     try {
       const fetches = [api.listDemands(true), api.listApplies({}, true)]
       if (!background) fetches.push(api.getFavorites({ user_id: userId, type: 'demand' }, true))
       const [demandsRes, appliesRes, favRes] = await Promise.all(fetches)
 
-      const favIds = new Set((favRes && favRes.data || []).map(f => f.target_id))
+      const favIds = new Set((favRes && favRes.data || []).map((item) => item.target_id))
       if (!background && favRes) {
         getApp().globalData.favoriteDemandIds = [...favIds]
       }
 
       const appliedSet = {}
       const acceptedDemandIds = {}
-      ;(appliesRes.data || []).forEach(a => {
-        if (a.teacher_user_id === userId) appliedSet[a.demand_id] = a.status
-        if (a.status === 'accepted') acceptedDemandIds[a.demand_id] = true
+      ;(appliesRes.data || []).forEach((item) => {
+        if (Number(item.teacher_user_id) === Number(userId)) appliedSet[item.demand_id] = item.status
+        if (item.status === 'accepted') acceptedDemandIds[item.demand_id] = true
       })
 
       const newDemandIds = {}
       const prevTime = this._prevBrowseTime
       const existingFavById = {}
-      this.data.allOpenDemands.forEach(d => { existingFavById[d.id] = !!d.isFav })
+      this.data.allOpenDemands.forEach((item) => { existingFavById[item.id] = !!item.isFav })
 
       const open = (demandsRes.data || [])
-        .filter(d => shouldShowDemand(d, appliedSet[d.id], acceptedDemandIds))
+        .filter((item) => shouldShowDemand(item, appliedSet[item.id], acceptedDemandIds))
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .map(d => {
-          if (prevTime > 0 && new Date(d.createdAt).getTime() > prevTime) {
-            newDemandIds[d.id] = true
+        .map((item) => {
+          if (prevTime > 0 && new Date(item.createdAt).getTime() > prevTime) {
+            newDemandIds[item.id] = true
           }
-          return {
-            ...d,
-            dateText: d.createdAt ? d.createdAt.slice(0, 10) : '',
-            applyStatus: appliedSet[d.id] || '',
-            applyText: applyText(appliedSet[d.id]),
-            isFav: background
-              ? (existingFavById[d.id] !== undefined ? existingFavById[d.id] : false)
-              : favIds.has(d.id),
-          }
+          const isFav = background
+            ? (existingFavById[item.id] !== undefined ? existingFavById[item.id] : false)
+            : favIds.has(item.id)
+          return this.decorateDemand(item, appliedSet, newDemandIds, isFav)
         })
 
-      const subjects = [ALL, ...Array.from(new Set(open.map(d => d.subject).filter(Boolean)))]
-      const areas = [ALL, ...Array.from(new Set(open.map(d => d.area).filter(Boolean)))]
+      const subjects = [ALL, ...Array.from(new Set(open.map((item) => item.subject).filter(Boolean)))]
+      const areas = [ALL, ...Array.from(new Set(open.map((item) => item.area).filter(Boolean)))]
 
       this.setData({ allOpenDemands: open, appliedSet, newDemandIds, subjects, areas }, this.applyFilters)
     } catch (_) {
@@ -130,13 +194,13 @@ Page({
         api.listTeachers(true),
         api.getFavorites({ user_id: userId, type: 'teacher' }, true),
       ])
-      const favTeacherIds = (favRes.data || []).map(f => f.target_id)
+      const favTeacherIds = (favRes.data || []).map((item) => item.target_id)
       getApp().globalData.favoriteTeacherIds = favTeacherIds
-      const teacher = (teachersRes.data || []).find(t => t.user_id === userId) || null
+      const teacher = (teachersRes.data || []).find((item) => Number(item.user_id) === Number(userId)) || null
       const isFavTeacher = teacher ? favTeacherIds.includes(teacher.id) : false
       this.setData({
         teacherSummary: teacher,
-        teacherInitial: teacher ? (teacher.real_name || '\u5E08').slice(0, 1) : '\u5E08',
+        teacherInitial: teacher ? (teacher.real_name || '师').slice(0, 1) : '师',
         isFavTeacher,
       })
     } catch (_) {}
@@ -146,30 +210,38 @@ Page({
     const id = Number(e.currentTarget.dataset.id)
     const uid = getApp().globalData.userId
     if (!uid) return
-    const demand = this.data.allOpenDemands.find(d => d.id === id)
+    const demand = this.data.allOpenDemands.find((item) => item.id === id)
     if (!demand) return
+
     const added = !demand.isFav
-    this.setData({ allOpenDemands: this.data.allOpenDemands.map(d => d.id === id ? { ...d, isFav: added } : d) }, this.applyFilters)
+    this.setData({
+      allOpenDemands: this.data.allOpenDemands.map((item) => (item.id === id ? { ...item, isFav: added } : item)),
+    }, this.applyFilters)
+
     wx.showToast({ title: added ? '已收藏' : '已取消收藏', icon: 'none' })
+
     const call = added
-      ? api.addFavorite({ user_id: uid, target_id: id, target_type: 'demand' })
-      : api.removeFavorite({ user_id: uid, target_id: id, target_type: 'demand' })
+      ? api.addFavorite({ target_id: id, target_type: 'demand' })
+      : api.removeFavorite({ target_id: id, target_type: 'demand' })
+
     call.catch(() => {
-      this.setData({ allOpenDemands: this.data.allOpenDemands.map(d => d.id === id ? { ...d, isFav: !added } : d) }, this.applyFilters)
+      this.setData({
+        allOpenDemands: this.data.allOpenDemands.map((item) => (item.id === id ? { ...item, isFav: !added } : item)),
+      }, this.applyFilters)
     })
   },
 
   toggleFavTeacher() {
-    const uid = getApp().globalData.userId
     const teacher = this.data.teacherSummary
-    if (!teacher || !uid) return
+    if (!teacher) return
     const was = this.data.isFavTeacher
     const added = !was
     this.setData({ isFavTeacher: added })
-    wx.showToast({ title: added ? '已收藏老师资料' : '已取消收藏', icon: 'none' })
+    wx.showToast({ title: added ? '已收藏' : '已取消收藏', icon: 'none' })
+
     const call = added
-      ? api.addFavorite({ user_id: uid, target_id: teacher.id, target_type: 'teacher' })
-      : api.removeFavorite({ user_id: uid, target_id: teacher.id, target_type: 'teacher' })
+      ? api.addFavorite({ target_id: teacher.id, target_type: 'teacher' })
+      : api.removeFavorite({ target_id: teacher.id, target_type: 'teacher' })
     call.catch(() => { this.setData({ isFavTeacher: was }) })
   },
 
@@ -193,24 +265,25 @@ Page({
         api.listDemands(true),
         api.listApplies({}, true),
       ])
+
       const nextSet = {}
       const acceptedDemandIds = {}
-      ;(appliesRes.data || []).forEach(a => {
-        if (a.teacher_user_id === userId) nextSet[a.demand_id] = a.status
-        if (a.status === 'accepted') acceptedDemandIds[a.demand_id] = true
+      ;(appliesRes.data || []).forEach((item) => {
+        if (Number(item.teacher_user_id) === Number(userId)) nextSet[item.demand_id] = item.status
+        if (item.status === 'accepted') acceptedDemandIds[item.demand_id] = true
       })
 
       let changed = false
-      ;(appliesRes.data || []).filter(a => a.teacher_user_id === userId).forEach(a => {
-        const oldStatus = this.data.appliedSet[a.demand_id]
-        if (oldStatus && oldStatus !== a.status) {
+      ;(appliesRes.data || []).filter((item) => Number(item.teacher_user_id) === Number(userId)).forEach((item) => {
+        const oldStatus = this.data.appliedSet[item.demand_id]
+        if (oldStatus && oldStatus !== item.status) {
           changed = true
-          if (a.status === 'accepted' || a.status === 'rejected') {
-            const demand = this.data.allOpenDemands.find(d => d.id === a.demand_id)
+          if (item.status === 'accepted' || item.status === 'rejected') {
+            const demand = this.data.allOpenDemands.find((row) => row.id === item.demand_id)
             getApp().addStudentNotification({
-              applyId: a.id,
-              demandId: a.demand_id,
-              status: a.status,
+              applyId: item.id,
+              demandId: item.demand_id,
+              status: item.status,
               demandTitle: (demand && demand.title) || '',
             })
           }
@@ -218,35 +291,42 @@ Page({
       })
 
       const visibleIds = {}
-      ;(demandsRes.data || []).forEach(d => {
-        if (shouldShowDemand(d, nextSet[d.id], acceptedDemandIds)) visibleIds[d.id] = true
+      ;(demandsRes.data || []).forEach((item) => {
+        if (shouldShowDemand(item, nextSet[item.id], acceptedDemandIds)) visibleIds[item.id] = true
       })
-      const listChanged = this.data.allOpenDemands.length !== Object.keys(visibleIds).length ||
-        this.data.allOpenDemands.some(d => !visibleIds[d.id])
+
+      const listChanged = this.data.allOpenDemands.length !== Object.keys(visibleIds).length
+        || this.data.allOpenDemands.some((item) => !visibleIds[item.id])
       if (!changed && !listChanged) return
 
       const existingById = {}
-      this.data.allOpenDemands.forEach(d => {
-        existingById[d.id] = { applyStatus: d.applyStatus || '', isFav: !!d.isFav }
+      this.data.allOpenDemands.forEach((item) => {
+        existingById[item.id] = { applyStatus: item.applyStatus || '', isFav: !!item.isFav }
       })
+
       const allOpenDemands = (demandsRes.data || [])
-        .filter(d => shouldShowDemand(d, nextSet[d.id], acceptedDemandIds))
+        .filter((item) => shouldShowDemand(item, nextSet[item.id], acceptedDemandIds))
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .map(d => ({
-          ...d,
-          dateText: d.createdAt ? d.createdAt.slice(0, 10) : '',
-          applyStatus: nextSet[d.id] || '',
-          applyText: applyText(nextSet[d.id]),
-          isFav: existingById[d.id] !== undefined ? existingById[d.id].isFav : false,
-          statusChanged: existingById[d.id] !== undefined && existingById[d.id].applyStatus !== (nextSet[d.id] || ''),
-        }))
-      const syncTip = listChanged ? '\u9700\u6C42\u72B6\u6001\u5DF2\u66F4\u65B0' : '\u7533\u8BF7\u72B6\u6001\u5DF2\u66F4\u65B0'
+        .map((item) => {
+          const decorated = this.decorateDemand(
+            item,
+            nextSet,
+            this.data.newDemandIds,
+            existingById[item.id] ? existingById[item.id].isFav : false
+          )
+          decorated.statusChanged = existingById[item.id]
+            && existingById[item.id].applyStatus !== (nextSet[item.id] || '')
+          return decorated
+        })
+
+      const syncTip = listChanged ? '需求列表已更新' : '申请状态已更新'
       const leavingDemandIds = {}
       if (listChanged) {
-        this.data.allOpenDemands.forEach(d => {
-          if (!allOpenDemands.find(n => n.id === d.id)) leavingDemandIds[d.id] = true
+        this.data.allOpenDemands.forEach((item) => {
+          if (!allOpenDemands.find((next) => next.id === item.id)) leavingDemandIds[item.id] = true
         })
       }
+
       if (Object.keys(leavingDemandIds).length > 0) {
         this.setData({ leavingDemandIds, syncTip })
         setTimeout(() => {
@@ -255,9 +335,10 @@ Page({
       } else {
         this.setData({ appliedSet: nextSet, allOpenDemands, syncTip }, this.applyFilters)
       }
+
       setTimeout(() => {
         if (this.data.syncTip === syncTip) {
-          const cleared = this.data.allOpenDemands.map(d => ({ ...d, statusChanged: false }))
+          const cleared = this.data.allOpenDemands.map((item) => ({ ...item, statusChanged: false }))
           this.setData({ syncTip: '', allOpenDemands: cleared }, this.applyFilters)
         }
       }, 2400)
@@ -282,10 +363,14 @@ Page({
 
   applyFilters() {
     const kw = (this.data.keyword || '').trim().toLowerCase()
-    const filtered = this.data.allOpenDemands.filter(d => {
-      const subjectOk = this.data.selectedSubject === ALL || d.subject === this.data.selectedSubject
-      const areaOk = this.data.selectedArea === ALL || d.area === this.data.selectedArea
-      const kwOk = !kw || d.title.toLowerCase().includes(kw) || d.subject.toLowerCase().includes(kw) || d.area.toLowerCase().includes(kw)
+    const filtered = this.data.allOpenDemands.filter((item) => {
+      const subjectOk = this.data.selectedSubject === ALL || item.subject === this.data.selectedSubject
+      const areaOk = this.data.selectedArea === ALL || item.area === this.data.selectedArea
+      const keywordPool = [item.title, item.subject, item.area, item.address]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+      const kwOk = !kw || keywordPool.includes(kw)
       return subjectOk && areaOk && kwOk
     })
     this.setData({ filteredDemands: filtered })
@@ -295,6 +380,23 @@ Page({
     const demandId = e.currentTarget.dataset.demandId
     getApp().globalData.currentDemandId = demandId
     wx.navigateTo({ url: `/pages/apply-demand/apply-demand?demandId=${demandId}` })
+  },
+
+  openDemandLocation(e) {
+    const demandId = Number(e.currentTarget.dataset.id)
+    const demand = this.data.filteredDemands.find((item) => item.id === demandId)
+    if (!demand || !demand.hasLocation) {
+      wx.showToast({ title: '该需求未填写地图位置', icon: 'none' })
+      return
+    }
+
+    wx.openLocation({
+      latitude: Number(demand.latitude),
+      longitude: Number(demand.longitude),
+      name: demand.title || '家教需求位置',
+      address: demand.address || demand.area || '',
+      scale: 16,
+    })
   },
 
   goTeacherProfile() {

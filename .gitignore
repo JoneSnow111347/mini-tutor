@@ -1,0 +1,6 @@
+.claude/
+CLAUDE.md
+server/.env
+server/node_modules/
+server/uploads/identity/*
+!server/uploads/identity/.gitkeep

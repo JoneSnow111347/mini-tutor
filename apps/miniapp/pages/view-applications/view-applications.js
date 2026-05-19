@@ -1,4 +1,3 @@
-const { confirmLogout } = require('../../utils/page')
 const { api } = require('../../utils/request')
 
 const POLL_INTERVAL_MS = 5000
@@ -57,7 +56,7 @@ Page({
       const uid = getApp().globalData.userId
       const res = await api.listDemands(true)
       const mine = (res.data || [])
-        .filter(d => d.user_id === uid)
+        .filter(d => Number(d.user_id) === Number(uid))
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .map(d => ({
           ...d,
@@ -172,7 +171,7 @@ Page({
     const was = !!this.data.favTeacherMap[teacherId]
     const added = !was
     this.setData({ favTeacherMap: { ...this.data.favTeacherMap, [teacherId]: added } })
-    wx.showToast({ title: added ? '已收藏老师' : '已取消收藏', icon: 'none' })
+    wx.showToast({ title: added ? '已收藏' : '已取消收藏', icon: 'none' })
     const call = added
       ? api.addFavorite({ user_id: uid, target_id: teacherId, target_type: 'teacher' })
       : api.removeFavorite({ user_id: uid, target_id: teacherId, target_type: 'teacher' })
@@ -187,7 +186,9 @@ Page({
     const label    = decision === 'accepted' ? '接受' : '拒绝'
     wx.showModal({
       title: `确认${label}`,
-      content: `确定${label}这位老师的申请吗？`,
+      content: decision === 'accepted'
+        ? '接受后老师将获得你的联系方式，可以开始沟通。'
+        : '拒绝后该老师将无法继续申请此需求。',
       confirmText: label,
       confirmColor: decision === 'accepted' ? '#34c759' : '#ff3b30',
       success: async (res) => {
@@ -231,8 +232,8 @@ Page({
     const demand = this.data.selectedDemand
     if (!demand || !demand.canClose) return
     wx.showModal({
-      title: '关闭订单',
-      content: '确定关闭此需求吗？关闭后该教师申请将隐藏并不再显示。',
+      title: '关闭需求',
+      content: '关闭后老师无法继续申请，已有申请不受影响。',
       confirmText: '关闭',
       confirmColor: '#ff3b30',
       success: async (res) => {
@@ -240,13 +241,10 @@ Page({
         try {
           await api.closeDemand(demand.id)
           this.setData({ selectedDemand: { ...demand, status: 'closed', displayStatus: 'closed', statusText: '已关闭', canClose: false } })
-          wx.showToast({ title: '订单已关闭', icon: 'success' })
+          wx.showToast({ title: '已关闭', icon: 'success' })
         } catch (_) {}
       },
     })
   },
 
-  handleGlobalLogout() {
-    confirmLogout(this)
-  },
 })

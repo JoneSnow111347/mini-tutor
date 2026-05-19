@@ -77,38 +77,40 @@ function formatDate(iso) {
 
 <template>
   <view class="page-container">
-    <!-- Publish shortcut -->
-    <button class="btn-primary" @tap="goPublish">＋ 发布新需求</button>
+    <!-- Loading -->
+    <view v-if="loading" class="empty-tip">加载中...</view>
 
     <!-- Empty state -->
-    <view v-if="!loading && demands.length === 0" class="empty-tip">
-      还没有发布过需求，点击上方按钮开始发布
+    <view v-else-if="demands.length === 0" class="empty-state">
+      <text class="empty-title">还没有发布过需求</text>
+      <text class="empty-desc">发布需求后，老师会主动申请接单</text>
+      <button class="btn-primary btn-sm" @tap="goPublish">发布第一个需求</button>
     </view>
 
     <!-- Demand cards -->
-    <view v-for="d in demands" :key="d.id" class="card">
-      <view class="card-row">
-        <text class="card-title">{{ d.title }}</text>
-        <text :class="['badge', statusBadge(d.status)]">{{ statusLabel(d.status) }}</text>
+    <view v-else>
+      <view v-for="d in demands" :key="d.id" class="card">
+        <view class="card-row">
+          <text class="card-title">{{ d.title }}</text>
+          <text :class="['badge', statusBadge(d.status)]">{{ statusLabel(d.status) }}</text>
+        </view>
+
+        <text class="card-meta">{{ d.subject }} · {{ d.grade_level }}</text>
+        <text class="card-meta">{{ d.area }} · {{ d.class_mode }} · {{ formatDate(d.createdAt) }}</text>
+
+        <view class="card-actions">
+          <button class="btn-primary btn-sm" @tap="goViewApplications(d.id)">
+            查看申请
+          </button>
+          <button
+            v-if="d.status === 'open'"
+            class="btn-danger btn-sm"
+            @tap="closeDemand(d)"
+          >关闭</button>
+        </view>
       </view>
 
-      <text class="card-meta">科目：{{ d.subject }} · 年级：{{ d.grade_level }}</text>
-      <text class="card-meta">地区：{{ d.area }} · {{ d.class_mode }}</text>
-      <text class="card-meta">发布于 {{ formatDate(d.createdAt) }}</text>
-
-      <hr class="divider" />
-
-      <view class="card-actions">
-        <button class="btn-primary btn-sm" @tap="goViewApplications(d.id)">
-          查看申请
-        </button>
-        <button
-          v-if="d.status === 'open'"
-          class="btn-danger btn-sm"
-          @tap="closeDemand(d)"
-        >关闭需求</button>
-        <text v-else style="color:#aaa;font-size:26rpx;">需求已关闭</text>
-      </view>
+      <button class="btn-secondary publish-bottom" @tap="goPublish">发布新需求</button>
     </view>
   </view>
 </template>
@@ -124,6 +126,30 @@ function formatDate(iso) {
   display: flex;
   gap: 16rpx;
   align-items: center;
-  flex-wrap: wrap;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.04);
+}
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 24rpx;
+  text-align: center;
+}
+.empty-title {
+  color: #2D2A26;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.empty-desc {
+  margin-top: 12rpx;
+  margin-bottom: 32rpx;
+  color: #A09890;
+  font-size: 26rpx;
+}
+.publish-bottom {
+  margin-top: 16rpx;
+  margin-bottom: 48rpx;
 }
 </style>

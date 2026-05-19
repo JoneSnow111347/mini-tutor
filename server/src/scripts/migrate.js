@@ -1,5 +1,7 @@
 'use strict';
 
+require('../load-env')();
+
 const { sequelize } = require('../db');
 
 async function columnExists(table, column) {
@@ -27,6 +29,25 @@ async function migrate() {
     console.log('Added teachers.phone');
   } else {
     console.log('teachers.phone already exists, skipping.');
+  }
+
+  if (!await columnExists('demands', 'address')) {
+    await sequelize.query('ALTER TABLE demands ADD COLUMN address VARCHAR(255) NULL AFTER area');
+    console.log('Added demands.address');
+  } else {
+    console.log('demands.address already exists, skipping.');
+  }
+  if (!await columnExists('demands', 'latitude')) {
+    await sequelize.query('ALTER TABLE demands ADD COLUMN latitude DECIMAL(10,7) NULL AFTER address');
+    console.log('Added demands.latitude');
+  } else {
+    console.log('demands.latitude already exists, skipping.');
+  }
+  if (!await columnExists('demands', 'longitude')) {
+    await sequelize.query('ALTER TABLE demands ADD COLUMN longitude DECIMAL(10,7) NULL AFTER latitude');
+    console.log('Added demands.longitude');
+  } else {
+    console.log('demands.longitude already exists, skipping.');
   }
 
   // favorites table

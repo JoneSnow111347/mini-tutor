@@ -23,6 +23,6 @@
     <input class="form-input" type="text" placeholder="多个科目用逗号分隔，如：数学,物理" value="{{teaching_subjects}}" bindinput="onSubjectsInput" />
     <text class="form-hint">例：数学,物理,化学</text>
   </view>
-  <button class="btn-primary" disabled="{{loading}}" bindtap="handleRegister">{{loading ? '注册中...' : '立即注册'}}</button>
+  <button class="btn-primary" loading="{{loading}}" disabled="{{loading}}" bindtap="handleRegister">{{loading ? '注册中...' : '立即注册'}}</button>
   <text class="link-text" bindtap="goLogin">已有账号？直接登录</text>
 </view>

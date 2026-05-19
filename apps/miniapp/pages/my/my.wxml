@@ -6,17 +6,21 @@
       <button class="btn-primary" bindtap="goLogin">立即登录</button>
     </view>
   </block>
+
   <block wx:else>
     <view class="profile-header">
-      <view wx:if="{{badgeCount > 0}}" class="notification-badge {{badgeFlash ? 'badge-flash' : ''}}">{{badgeCount > 99 ? '99+' : badgeCount}}</view>
+      <view wx:if="{{badgeCount > 0}}" class="notification-badge {{badgeFlash ? 'badge-flash' : ''}}">
+        {{badgeCount > 99 ? '99+' : badgeCount}}
+      </view>
       <view class="avatar"><text>{{avatarText}}</text></view>
       <text class="nickname">{{nickname}}</text>
       <view class="badge-row role-row">
-        <text class="badge badge-verified">{{role === 'teacher' ? '教师' : '家长/学生'}}</text>
+        <text class="badge badge-verified">{{role === 'teacher' ? '老师' : '家长/学生'}}</text>
         <text class="badge badge-open">基础用户</text>
       </view>
       <text class="phone">{{maskedPhone}}</text>
     </view>
+
     <view class="stats-card">
       <view wx:for="{{stats}}" wx:key="label" class="stat-item {{item.flash ? 'stat-flash' : ''}}" data-index="{{index}}" bindtap="goStat">
         <text class="stat-value">{{loading ? '-' : item.value}}</text>
@@ -24,6 +28,7 @@
         <text class="stat-badge badge {{index === 2 ? 'badge-pending' : index === 1 ? 'badge-accepted' : 'badge-applied'}}">{{item.badge}}</text>
       </view>
     </view>
+
     <view class="menu-card">
       <view class="menu-item" bindtap="goFavorites">
         <text class="menu-label">我的收藏</text>
@@ -36,7 +41,7 @@
         <text class="menu-arrow">></text>
       </view>
       <view wx:if="{{role === 'teacher'}}" class="menu-item" bindtap="goProfile">
-        <text class="menu-label">编辑教师资料</text>
+        <text class="menu-label">编辑老师资料</text>
         <text class="menu-arrow">></text>
       </view>
       <view wx:else class="menu-item" bindtap="goPublishDemand">
@@ -49,10 +54,16 @@
         <text class="menu-arrow">></text>
       </view>
     </view>
+
     <view class="menu-card">
       <view class="menu-item" bindtap="showProfileInfo">
         <text class="menu-label">个人资料</text>
-        <text class="menu-sub">{{role === 'teacher' ? '教师' : '家长/学生'}}</text>
+        <text class="menu-sub">{{role === 'teacher' ? '老师' : '家长/学生'}}</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="goIdentityVerify">
+        <text class="menu-label">身份认证</text>
+        <text class="menu-sub">{{identityStatusText}}</text>
         <text class="menu-arrow">></text>
       </view>
       <view class="menu-item" bindtap="showTodo">
@@ -64,7 +75,9 @@
         <text class="menu-arrow">></text>
       </view>
     </view>
+
     <button class="btn-secondary logout-btn" bindtap="handleLogout">退出登录</button>
   </block>
+
   <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

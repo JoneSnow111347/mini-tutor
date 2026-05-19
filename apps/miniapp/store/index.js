@@ -26,16 +26,19 @@ export const state = reactive({
 
 // ── Bootstrap — call once in main.js ───────────────────────────────────────
 export function initStore() {
-  const userId = wx.getStorageSync('userId')
-  if (!userId) return
+  const userInfo = wx.getStorageSync('userInfo')
+  if (!userInfo || !userInfo.id) return
 
-  state.userId   = Number(userId)
-  state.role     = wx.getStorageSync('role')     || null
-  state.nickname = wx.getStorageSync('nickname') || null
-  state.token    = wx.getStorageSync('token')    || null
+  state.userId   = Number(userInfo.id)
+  state.role     = userInfo.role || null
+  state.nickname = userInfo.nickname || null
+  state.token    = userInfo.token || null
 
   const tid = wx.getStorageSync('teacherId')
-  state.teacherId = tid ? Number(tid) : null
+  state.teacherId = isTeacher() && tid ? Number(tid) : null
+  if (!isTeacher()) {
+    wx.removeStorageSync('teacherId')
+  }
 }
 
 // ── After login / register ──────────────────────────────────────────────────
@@ -50,11 +53,37 @@ export function saveSession(user, teacherId = null) {
   state.teacherId = teacherId
   state.token     = user.token || null
 
-  wx.setStorageSync('userId',   user.id)
-  wx.setStorageSync('role',     user.role)
-  wx.setStorageSync('nickname', user.nickname || '')
+  // Single source of truth: userInfo object
+  const userInfo = {
+    id:       user.id,
+    role:     user.role,
+    nickname: user.nickname || '',
+    token:    user.token || null,
+  }
+  wx.setStorageSync('userInfo', userInfo)
+
   if (teacherId) wx.setStorageSync('teacherId', teacherId)
-  if (user.token) wx.setStorageSync('token', user.token)
+  else wx.removeStorageSync('teacherId')
+}
+
+// ── Re-sync from storage (after native logout clears storage) ──────────────
+export function syncFromStorage() {
+  const userInfo = wx.getStorageSync('userInfo')
+  if (!userInfo || !userInfo.id) {
+    state.userId = null
+    state.role = null
+    state.teacherId = null
+    state.nickname = null
+    state.token = null
+    return false
+  }
+  state.userId = Number(userInfo.id)
+  state.role = userInfo.role || null
+  state.nickname = userInfo.nickname || null
+  state.token = userInfo.token || null
+  const tid = wx.getStorageSync('teacherId')
+  state.teacherId = isTeacher() && tid ? Number(tid) : null
+  return true
 }
 
 // ── Logout ──────────────────────────────────────────────────────────────────
@@ -64,7 +93,13 @@ export function clearSession() {
   state.teacherId = null
   state.nickname  = null
   state.token     = null
-  wx.clearStorageSync()
+  // Remove userInfo (canonical) and legacy flat keys
+  wx.removeStorageSync('userInfo')
+  wx.removeStorageSync('userId')
+  wx.removeStorageSync('role')
+  wx.removeStorageSync('nickname')
+  wx.removeStorageSync('token')
+  wx.removeStorageSync('teacherId')
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────

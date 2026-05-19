@@ -7,6 +7,15 @@ function maskPhone(phone) {
   return phone.slice(0, 3) + '****' + phone.slice(-4)
 }
 
+function identityStatusText(status) {
+  return {
+    approved: '已认证',
+    pending: '审核中',
+    rejected: '已驳回',
+    unverified: '未认证',
+  }[status] || '未认证'
+}
+
 Page({
   data: {
     userInfo: null,
@@ -14,6 +23,7 @@ Page({
     nickname: '',
     avatarText: '',
     maskedPhone: '',
+    identityStatusText: '未认证',
     badgeCount: 0,
     badgeFlash: false,
     stats: [
@@ -61,7 +71,7 @@ Page({
     const role = app.globalData.role
     const nickname = userInfo.nickname || (role === 'teacher' ? '老师' : '家长')
     const badgeCount = role === 'teacher'
-      ? app.getUnreadNotificationCount() + app.globalData.newDemandsCount
+      ? app.getUnreadNotificationCount()
       : app.globalData.pendingCount
 
     this.setData({
@@ -70,6 +80,7 @@ Page({
       nickname,
       avatarText: nickname.slice(0, 1),
       maskedPhone: maskPhone(userInfo.phone),
+      identityStatusText: identityStatusText(userInfo.identity_status),
       badgeCount,
     })
   },
@@ -88,7 +99,7 @@ Page({
           api.getMessages({ user_id: userId }, true),
         ])
         const accepted = (appliesRes.data || []).filter(a => a.status === 'accepted').length
-        const unread = (messagesRes.data || []).filter(m => !m.is_read).length + (app.globalData.newDemandsCount || 0)
+        const unread = (messagesRes.data || []).filter(m => !m.is_read).length
         nextStats = [
           { label: '收藏', value: (app.globalData.favoriteDemandIds || []).length, badge: '收藏' },
           { label: '订单', value: accepted, badge: '已接单' },
@@ -185,6 +196,14 @@ Page({
       confirmText: '知道了',
       showCancel: false,
     })
+  },
+
+  goIdentityVerify() {
+    if (this.data.role === 'teacher') {
+      wx.navigateTo({ url: '/pages/teacher-profile/edit-teacher' })
+      return
+    }
+    wx.navigateTo({ url: '/pages/identity/verify' })
   },
 
   goFavorites() {

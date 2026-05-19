@@ -1,4 +1,4 @@
-const { api } = require('../../utils/request')
+const { api, normalizeErrorMessage } = require('../../utils/request')
 
 Page({
   data: {
@@ -45,27 +45,24 @@ Page({
 
     this.setData({ loading: true, message: '', feedbackType: '' })
     try {
-      const loginRes = await api.login(this.data.phone.trim())
-      console.log('LOGIN RESPONSE:', loginRes)
+      const loginRes = await api.login(this.data.phone.trim(), this.data.password.trim())
       const payload = loginRes.data
       const user = payload.user || payload
       const token = payload.token || user.token
 
-      if (token) {
-        wx.setStorageSync('token', token)
-      }
-      wx.setStorageSync('user', user)
-      console.log('SAVED TOKEN:', wx.getStorageSync('token') ? 'exists' : 'missing')
+      // setSession handles all storage writes — no pre-writes needed
 
       if (this.data.role === 'teacher') {
-        const teacherListRes = await api.listTeachers(true)
-        const teacherRecord = teacherListRes.data.find((item) => item.user_id === user.id)
-        if (user.role !== 'teacher') {
-          const message = '该手机号不是教师账号，请切换身份后登录'
+        if (!['teacher', 'both'].includes(user.role)) {
+          const message = '该手机号不是老师账号，请切换为家长身份登录'
           this.setData({ message, feedbackType: 'error' })
           wx.showToast({ title: message, icon: 'none' })
           return
         }
+
+        const teacherListRes = await api.listTeachers(true)
+        const teacherRecord = (teacherListRes.data || []).find((item) => Number(item.user_id) === Number(user.id))
+
         getApp().setSession(user, teacherRecord ? teacherRecord.id : null)
         wx.reLaunch({
           url: teacherRecord ? '/pages/teacher/teacher' : '/pages/teacher-profile/edit-teacher',
@@ -73,8 +70,8 @@ Page({
         return
       }
 
-      if (user.role === 'teacher') {
-        const message = '该手机号是教师账号，请切换到教师身份登录'
+      if (['teacher', 'both'].includes(user.role)) {
+        const message = '该手机号是老师账号，请切换到老师身份登录'
         this.setData({ message, feedbackType: 'error' })
         wx.showToast({ title: message, icon: 'none' })
         return
@@ -85,7 +82,7 @@ Page({
       wx.reLaunch({ url: '/pages/parent/parent' })
     } catch (error) {
       this.setData({
-        message: (error && error.message) || '登录失败，请检查手机号和密码后重试',
+        message: normalizeErrorMessage(error, '登录失败，请检查手机号和密码后重试'),
         feedbackType: 'error',
       })
     } finally {
@@ -94,6 +91,6 @@ Page({
   },
 
   goRegister() {
-    wx.navigateTo({ url: '/pages/register/register' })
+    wx.navigateTo({ url: '/pages/register/register?role=' + this.data.role })
   },
 })

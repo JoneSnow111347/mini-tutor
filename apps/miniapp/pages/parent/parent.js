@@ -204,7 +204,7 @@ Page({
             this.setData({ demands, closingDemandId: null })
             const pending = demands.reduce((n, d) => n + (d.pendingCount || 0), 0)
             this.setData({ pendingCount: pending })
-            wx.showToast({ title: '订单已关闭', icon: 'success' })
+            wx.showToast({ title: '已关闭', icon: 'success' })
           }, 380)
         } catch (_) {}
       },

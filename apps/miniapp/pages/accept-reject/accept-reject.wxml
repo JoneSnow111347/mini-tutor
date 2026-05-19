@@ -1,10 +1,9 @@
 <view class="container">
-  <view wx:if="{{loading}}" class="empty-tip">正在加载申请...</view>
+  <view wx:if="{{loading}}" class="empty-tip">正在加载申请详情...</view>
 
   <block wx:elif="{{apply}}">
     <view wx:if="{{demand}}" class="card">
-      <text class="eyebrow">所属需求</text>
-      <text class="card-title demand-title">{{demand.title}}</text>
+      <text class="card-title">{{demand.title}}</text>
       <text class="card-meta">{{demand.subject}} · {{demand.grade_level}} · {{demand.area}}</text>
     </view>
 
@@ -24,26 +23,24 @@
       </view>
 
       <view class="info-row">
-        <text class="info-key">申请时间</text>
+        <text class="info-key">申请于</text>
         <text class="info-val">{{apply.dateText}}</text>
       </view>
 
       <view wx:if="{{apply.message}}" class="message-box">
-        <text class="info-key">申请留言</text>
         <text class="message-text">{{apply.message}}</text>
       </view>
-      <text wx:if="{{teacher}}" class="profile-hint">点击查看完整老师资料  </text>
+      <text wx:if="{{teacher}}" class="profile-hint">查看完整资料 ></text>
     </view>
 
     <view wx:if="{{apply.status === 'pending'}}" class="decision-actions">
-      <button class="btn-success" disabled="{{submitting}}" loading="{{submitting}}" bindtap="confirmAccept">接受申请</button>
-      <button class="btn-danger" disabled="{{submitting}}" bindtap="confirmReject">拒绝申请</button>
+      <button class="btn-danger decision-reject" disabled="{{submitting}}" loading="{{submitting}}" bindtap="confirmReject">{{submitting ? '处理中...' : '拒绝'}}</button>
+      <button class="btn-success decision-accept" disabled="{{submitting}}" loading="{{submitting}}" bindtap="confirmAccept">{{submitting ? '处理中...' : '接受申请'}}</button>
     </view>
 
     <view wx:else class="status-banner {{apply.status === 'accepted' ? 'banner-success' : 'banner-danger'}}">
-      <text class="status-banner-title">该申请已处理</text>
-      <text class="status-banner-sub">当前状态：{{apply.statusText}}</text>
+      <text class="status-banner-title">{{apply.status === 'accepted' ? '已接受该申请' : '已拒绝该申请'}}</text>
+      <text class="status-banner-sub">{{apply.status === 'accepted' ? '老师已获得你的联系方式' : '该老师无法继续申请此需求'}}</text>
     </view>
   </block>
-  <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

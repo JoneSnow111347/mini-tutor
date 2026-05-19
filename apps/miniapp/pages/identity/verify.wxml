@@ -1,0 +1,70 @@
+<view class="identity-page">
+  <view class="hero-card">
+    <text class="hero-title">身份认证</text>
+    <text class="hero-sub">完成短信验证后，上传学生证或录取通知书图片，审核通过后即可完成身份认证。</text>
+    <view class="status-chip status-{{verificationStatus}}">
+      {{verificationStatusText}}
+    </view>
+  </view>
+
+  <view class="card section-card">
+    <text class="section-title">账号信息</text>
+    <view class="info-row">
+      <text class="info-label">手机号</text>
+      <text class="info-value">{{phone}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">短信状态</text>
+      <text class="info-value">{{smsVerified ? '已验证' : '未验证'}}</text>
+    </view>
+
+    <block wx:if="{{!smsVerified}}">
+      <view class="form-group">
+        <text class="form-label">验证码</text>
+        <view class="inline-row">
+          <input class="form-input code-input" maxlength="6" type="number" placeholder="输入 6 位验证码" value="{{smsCode}}" bindinput="onCodeInput" />
+          <button class="code-btn" disabled="{{sendingCode || sendCooldown > 0}}" bindtap="handleSendCode">
+            {{sendCooldown > 0 ? sendCooldown + 's' : '发送验证码'}}
+          </button>
+        </view>
+      </view>
+      <button class="btn-secondary verify-btn" loading="{{verifyingCode}}" disabled="{{verifyingCode}}" bindtap="handleVerifyCode">
+        {{verifyingCode ? '验证中...' : '验证短信'}}
+      </button>
+    </block>
+  </view>
+
+  <view class="card section-card">
+    <text class="section-title">上传认证材料</text>
+    <view class="type-grid">
+      <button class="type-btn {{documentType === 'student_id' ? 'type-btn-active' : ''}}" data-value="student_id" bindtap="selectDocumentType">学生证</button>
+      <button class="type-btn {{documentType === 'admission_notice' ? 'type-btn-active' : ''}}" data-value="admission_notice" bindtap="selectDocumentType">录取通知书</button>
+    </view>
+
+    <view class="upload-box" bindtap="chooseProof">
+      <text class="upload-title">{{selectedFileName || '点击选择 jpg/png 图片'}}</text>
+      <text class="upload-sub">仅支持 jpg、png，且大小不能超过 5MB</text>
+    </view>
+
+    <button class="btn-primary" loading="{{submitting}}" disabled="{{submitting || verificationStatus === 'pending' || verificationStatus === 'approved'}}" bindtap="submitVerification">
+      {{submitting ? '提交中...' : '提交认证'}}
+    </button>
+  </view>
+
+  <view wx:if="{{currentRecord}}" class="card section-card">
+    <text class="section-title">最近一次提交</text>
+    <view class="info-row">
+      <text class="info-label">材料类型</text>
+      <text class="info-value">{{currentRecord.document_type === 'student_id' ? '学生证' : '录取通知书'}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">审核状态</text>
+      <text class="info-value">{{currentRecord.status === 'approved' ? '已通过' : currentRecord.status === 'rejected' ? '已驳回' : '审核中'}}</text>
+    </view>
+    <view wx:if="{{reviewNote}}" class="note-box">
+      <text class="note-title">审核备注</text>
+      <text class="note-content">{{reviewNote}}</text>
+    </view>
+    <button class="btn-secondary" bindtap="previewCurrentProof">查看已上传图片</button>
+  </view>
+</view>

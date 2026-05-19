@@ -4,12 +4,12 @@
  *
  * Purpose:
  *   Landing page after parent login. Shows greeting and quick-action tiles.
- *   Logout clears session and returns to the role-selection home.
+ *   Logout clears session and returns to the login page.
  *
  * Navigation from here:
  *   → /pages/parent/publish-demand  (发布需求)
  *   → /pages/parent/my-demands      (我的需求)
- *   → /pages/index/index            (logout)
+ *   → /pages/login/login            (logout)
  */
 
 import { state, clearSession, isLoggedIn } from '@/store/index.js'
@@ -17,7 +17,7 @@ import { onMounted } from 'vue'
 
 onMounted(() => {
   if (!isLoggedIn()) {
-    wx.reLaunch({ url: '/pages/index/index' })
+    wx.reLaunch({ url: '/pages/login/login' })
   }
 })
 
@@ -36,7 +36,7 @@ function handleLogout() {
     success(res) {
       if (res.confirm) {
         clearSession()
-        wx.reLaunch({ url: '/pages/index/index' })
+        wx.reLaunch({ url: '/pages/login/login' })
       }
     }
   })

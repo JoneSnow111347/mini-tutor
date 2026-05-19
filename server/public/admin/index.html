@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>审核后台</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <section id="loginView" class="login-view">
+      <div class="login-card">
+        <p class="eyebrow">Tutor Admin</p>
+        <h1>老师认证审核后台</h1>
+        <p class="subtext">使用独立管理员账号登录，查看待审核材料并通过或驳回。</p>
+        <form id="loginForm" class="login-form">
+          <label>
+            <span>用户名</span>
+            <input id="usernameInput" type="text" autocomplete="username" placeholder="admin">
+          </label>
+          <label>
+            <span>密码</span>
+            <input id="passwordInput" type="password" autocomplete="current-password" placeholder="请输入密码">
+          </label>
+          <button type="submit" id="loginButton">登录</button>
+        </form>
+        <p id="loginMessage" class="message"></p>
+      </div>
+    </section>
+
+    <section id="dashboardView" class="dashboard-view hidden">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Tutor Admin</p>
+          <h1>老师认证审核</h1>
+        </div>
+        <div class="topbar-actions">
+          <span id="adminName" class="admin-name"></span>
+          <button id="refreshButton" class="ghost-button" type="button">刷新</button>
+          <button id="logoutButton" class="ghost-button" type="button">退出</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div>
+              <h2>审核队列</h2>
+              <p id="queueSummary">加载中...</p>
+            </div>
+            <select id="statusFilter">
+              <option value="pending">待审核</option>
+              <option value="approved">已通过</option>
+              <option value="rejected">已驳回</option>
+              <option value="all">全部</option>
+            </select>
+          </div>
+          <div id="verificationList" class="verification-list"></div>
+        </aside>
+
+        <section class="detail-panel">
+          <div id="emptyState" class="empty-state">
+            <h3>请选择一条审核记录</h3>
+            <p>左侧列表会显示老师上传的认证材料，点击后可查看详情和审核图片。</p>
+          </div>
+
+          <div id="detailView" class="detail-view hidden">
+            <div class="detail-header">
+              <div>
+                <p id="detailMeta" class="detail-meta"></p>
+                <h2 id="detailTitle"></h2>
+              </div>
+              <span id="detailStatus" class="status-badge"></span>
+            </div>
+
+            <div class="detail-grid">
+              <div class="info-card">
+                <h3>账号信息</h3>
+                <dl id="accountInfo" class="info-list"></dl>
+              </div>
+              <div class="info-card">
+                <h3>老师资料</h3>
+                <dl id="teacherInfo" class="info-list"></dl>
+              </div>
+            </div>
+
+            <div class="image-card">
+              <div class="image-card-header">
+                <h3>认证材料</h3>
+                <a id="imageLink" target="_blank" rel="noreferrer">新窗口查看原图</a>
+              </div>
+              <img id="proofImage" alt="认证材料">
+            </div>
+
+            <div class="review-card">
+              <h3>审核操作</h3>
+              <textarea id="reviewNote" rows="4" placeholder="填写审核备注，例如：材料清晰，审核通过"></textarea>
+              <div class="review-actions">
+                <button id="approveButton" class="approve-button" type="button">通过</button>
+                <button id="rejectButton" class="reject-button" type="button">驳回</button>
+              </div>
+              <p id="reviewMessage" class="message"></p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <script src="./admin.js"></script>
+</body>
+</html>

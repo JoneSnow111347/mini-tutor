@@ -29,6 +29,7 @@ Page({
     badgeFlash: false,
     leavingDemandIds: {},
     loading: false,
+    verificationStatus: '',
   },
 
   _pollTimer: null,
@@ -39,15 +40,19 @@ Page({
     if (!hasProfile) return
     await getApp().refreshNewDemandsCount()
     await this.refreshBadges()
-    this.loadDemands().then(() => this.startPolling())
+    const loaded = await this.loadDemands()
+    if (loaded) this.startPolling()
   },
 
   onHide()   { this.stopPolling() },
   onUnload() { this.stopPolling() },
 
   async onPullDownRefresh() {
-    await this.loadDemands()
-    this.refreshBadges()
+    const hasProfile = await this.ensureTeacherProfile()
+    if (hasProfile) {
+      await this.loadDemands()
+      this.refreshBadges()
+    }
     wx.stopPullDownRefresh()
   },
 
@@ -64,7 +69,7 @@ Page({
     try {
       const messagesRes = await api.getMessages({ user_id: userId }, true)
       const unread = (messagesRes.data || []).filter(m => !m.is_read).length
-      const next = unread + app.globalData.newDemandsCount
+      const next = unread
       const badgeFlash = this.data.badgeCount !== next && next > 0
       this.setData({ badgeCount: next, badgeFlash })
       if (badgeFlash) {
@@ -83,8 +88,10 @@ Page({
       if (!teacher) { wx.redirectTo({ url: '/pages/teacher-profile/edit-teacher' }); return false }
       app.globalData.teacherId = teacher.id
       wx.setStorageSync('teacherId', teacher.id)
+      this.setData({ verificationStatus: teacher.verification_status || 'unverified' })
       return true
-    } catch (_) {
+    } catch (error) {
+      if (error && error.statusCode === 401) return false
       return true
     }
   },
@@ -156,8 +163,16 @@ Page({
           this.setData({ demands, syncTip: '' }, this.applyFilters)
         }, 1400)
       }
-    } catch (_) {
-      this.setData({ demands: [], filteredDemands: [], appliedSet: {} })
+      return true
+    } catch (error) {
+      if (error && error.statusCode === 401) {
+        this.stopPolling()
+        return false
+      }
+      if (!background) {
+        this.setData({ demands: [], filteredDemands: [], appliedSet: {} })
+      }
+      return false
     } finally {
       if (!background) this.setData({ loading: false })
     }
@@ -231,6 +246,10 @@ Page({
 
   goProfile() {
     wx.navigateTo({ url: '/pages/teacher-profile/teacher-profile' })
+  },
+
+  goEditTeacher() {
+    wx.navigateTo({ url: '/pages/teacher-profile/edit-teacher' })
   },
 
   handleGlobalLogout() {

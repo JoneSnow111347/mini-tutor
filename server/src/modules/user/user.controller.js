@@ -1,18 +1,16 @@
 'use strict';
 
 const userService = require('./user.service');
+const { success, failure } = require('../../utils/response');
 
 function handleError(res, err) {
-  const status = err.status || 500;
-  const body = { success: false, message: err.message };
-  if (err.fields) body.errors = err.fields;
-  return res.status(status).json(body);
+  return failure(res, err, 'User request failed');
 }
 
 async function listUsers(req, res) {
   try {
     const data = await userService.listUsers();
-    return res.status(200).json({ success: true, data });
+    return success(res, { message: 'Users loaded', data });
   } catch (err) {
     return handleError(res, err);
   }
@@ -21,7 +19,7 @@ async function listUsers(req, res) {
 async function getUserById(req, res) {
   try {
     const user = await userService.getUserById(parseInt(req.params.id, 10));
-    return res.status(200).json({ success: true, data: user });
+    return success(res, { message: 'User loaded', data: user });
   } catch (err) {
     return handleError(res, err);
   }
@@ -29,8 +27,8 @@ async function getUserById(req, res) {
 
 async function login(req, res) {
   try {
-    const user = await userService.loginUser(req.body.phone);
-    return res.status(200).json({ success: true, data: user });
+    const user = await userService.loginUser(req.body.phone, req.body.password);
+    return success(res, { message: 'Login successful', data: user });
   } catch (err) {
     return handleError(res, err);
   }
@@ -39,7 +37,7 @@ async function login(req, res) {
 async function createUser(req, res) {
   try {
     const user = await userService.createUser(req.body);
-    return res.status(201).json({ success: true, message: 'User created', data: user });
+    return success(res, { status: 201, message: 'User created', data: user });
   } catch (err) {
     return handleError(res, err);
   }
@@ -58,11 +56,11 @@ async function updateUserById(req, res) {
     });
 
     if (Object.keys(payload).length === 0) {
-      return res.status(400).json({ success: false, message: 'No updatable fields provided' });
+      return failure(res, { status: 400, message: 'No updatable fields provided' });
     }
 
     const user = await userService.updateUserById(id, payload);
-    return res.status(200).json({ success: true, message: 'User updated', data: user });
+    return success(res, { message: 'User updated', data: user });
   } catch (err) {
     return handleError(res, err);
   }

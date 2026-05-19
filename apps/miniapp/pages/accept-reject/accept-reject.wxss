@@ -1,27 +1,20 @@
-.demand-title {
-  margin-top: 12rpx;
-}
-
-.teacher-card {
-  animation: slide-down 0.3s ease both;
-}
-
 .teacher-top {
   display: flex;
-  gap: 22rpx;
+  gap: 18rpx;
   align-items: flex-start;
 }
 
 .avatar {
-  width: 104rpx;
-  height: 104rpx;
-  border-radius: 30rpx;
-  background: linear-gradient(145deg, #e8f2ff, #ffffff);
-  color: #007aff;
-  font-size: 42rpx;
-  font-weight: 800;
-  line-height: 104rpx;
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: #ffffff;
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 92rpx;
   text-align: center;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.18);
 }
 
 .teacher-main {
@@ -31,67 +24,71 @@
 
 .teacher-name {
   display: block;
-  color: #111827;
-  font-size: 34rpx;
-  font-weight: 800;
+  color: #1A1714;
+  font-size: 32rpx;
+  font-weight: 600;
 }
 
 .teacher-subjects {
   display: block;
   margin-top: 8rpx;
-  color: #6b7280;
-  font-size: 25rpx;
-  line-height: 1.45;
+  color: #8C857D;
+  font-size: 28rpx;
+  line-height: 1.5;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
-  margin-top: 26rpx;
-  padding-top: 20rpx;
-  border-top: 1rpx solid #edf0f4;
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid rgba(255, 142, 83, 0.06);
 }
 
 .info-key {
-  color: #6b7280;
+  color: #8C857D;
   font-size: 24rpx;
 }
 
 .info-val {
-  color: #111827;
-  font-size: 25rpx;
-  font-weight: 650;
+  color: #1A1714;
+  font-size: 28rpx;
+  font-weight: 500;
 }
 
 .message-box {
-  margin-top: 22rpx;
-  padding: 20rpx;
-  border-radius: 22rpx;
-  background: #f5f7fb;
+  margin-top: 18rpx;
+  padding: 18rpx;
+  border-radius: 18rpx;
+  background: #FAFAF8;
 }
 
 .message-text {
   display: block;
-  margin-top: 10rpx;
-  color: #374151;
-  font-size: 25rpx;
-  line-height: 1.55;
+  color: #5A5550;
+  font-size: 28rpx;
+  line-height: 1.6;
 }
 
 .profile-hint {
   display: block;
-  margin-top: 18rpx;
-  color: #007aff;
-  font-size: 25rpx;
-  font-weight: 700;
+  margin-top: 16rpx;
+  color: #FF6B6B;
+  font-size: 24rpx;
+  font-weight: 500;
   text-align: right;
 }
 
 .decision-actions {
   display: flex;
-  gap: 18rpx;
+  gap: 12rpx;
 }
 
-.decision-actions button {
+.decision-reject {
+  flex: 0 0 auto;
+  min-width: 160rpx;
+}
+
+.decision-accept {
   flex: 1;
 }

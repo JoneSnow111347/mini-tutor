@@ -1,20 +1,93 @@
 <view class="container">
   <view class="ios-hero">
-    <text class="eyebrow">教师资料</text>
+    <text class="eyebrow">老师资料</text>
     <text class="title">{{hasProfile ? '编辑资料' : '完善资料'}}</text>
-    <text class="subtitle">资料将展示给家长，请填写真实姓名、科目和联系方式。</text>
+    <text class="subtitle">第一步：填写基础资料并保存。第二步：上传学生证或录取通知书完成认证。</text>
   </view>
-  <view wx:if="{{loading}}" class="empty-tip">正在加载资料...</view>
+
+  <view wx:if="{{loading}}" class="empty-tip">正在加载老师资料...</view>
+
   <block wx:else>
     <view class="card edit-card">
-      <view class="form-group"><text class="form-label">姓名<text class="required">*</text></text><input class="form-input" type="text" maxlength="20" value="{{real_name}}" bindinput="onNameInput" placeholder="请输入姓名" placeholder-class="placeholder" /></view>
-      <view class="form-group"><text class="form-label">科目<text class="required">*</text></text><input class="form-input" type="text" value="{{teaching_subjects}}" bindinput="onSubjectsInput" placeholder="多个科目用逗号分隔" placeholder-class="placeholder" /><text class="form-hint">例：数学,物理,英语</text></view>
-      <view class="form-group"><text class="form-label">手机号<text class="required">*</text></text><input class="form-input" type="number" maxlength="11" value="{{phone}}" bindinput="onPhoneInput" placeholder="请输入手机号" placeholder-class="placeholder" /><text class="form-hint">当前后端手机号属于登录账号，此处用于资料展示校验。</text></view>
-      <view class="form-group"><text class="form-label">认证状态</text><view class="verify-row"><button wx:for="{{verificationOptions}}" wx:key="value" class="verify-button {{verification_status === item.value ? 'verify-active' : ''}}" data-status="{{item.value}}" bindtap="selectVerification">{{item.label}}</button></view></view>
-      <view class="form-group"><text class="form-label">简介</text><textarea class="form-textarea" maxlength="300" value="{{bio}}" bindinput="onBioInput" placeholder="介绍教学经验、授课风格和可辅导年级" placeholder-class="placeholder" /><text class="char-count">{{bio.length}} / 300</text></view>
-      <view class="switch-row"><view><text class="form-label switch-label">公开资料</text><text class="form-hint">开启后家长可查看你的教师资料</text></view><switch checked="{{is_public}}" bindchange="onPublicChange" color="#34c759" /></view>
+      <view class="status-panel">
+        <view>
+          <text class="status-label">当前认证状态</text>
+          <text class="status-value">{{verificationText}}</text>
+        </view>
+        <view class="status-chip status-{{identityStatus}}">{{verificationText}}</view>
+      </view>
+      <text class="status-tip">资料提交后会进入审核队列，审核通常在 1-2 个工作日内完成。</text>
+
+      <view class="form-group">
+        <text class="form-label">姓名<text class="required">*</text></text>
+        <input class="form-input" type="text" maxlength="20" value="{{real_name}}" bindinput="onNameInput" placeholder="请输入真实姓名" placeholder-class="placeholder" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">科目<text class="required">*</text></text>
+        <input class="form-input" type="text" value="{{teaching_subjects}}" bindinput="onSubjectsInput" placeholder="多个科目用逗号分隔" placeholder-class="placeholder" />
+        <text class="form-hint">例如：数学, 英语, 物理</text>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">手机号<text class="required">*</text></text>
+        <input class="form-input" type="number" maxlength="11" value="{{phone}}" bindinput="onPhoneInput" placeholder="请输入手机号" placeholder-class="placeholder" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">简介</text>
+        <textarea class="form-textarea" maxlength="300" value="{{bio}}" bindinput="onBioInput" placeholder="介绍教学经验、授课风格和可辅导年级" placeholder-class="placeholder"></textarea>
+        <text class="char-count">{{bio.length}} / 300</text>
+      </view>
+
+      <view class="switch-row">
+        <view>
+          <text class="form-label switch-label">公开资料</text>
+          <text class="form-hint">开启后家长可以查看你的老师资料。</text>
+        </view>
+        <switch checked="{{is_public}}" bindchange="onPublicChange" color="#34c759" />
+      </view>
     </view>
-    <button class="btn-primary" disabled="{{submitting}}" loading="{{submitting}}" bindtap="saveProfile">{{submitting ? '保存中...' : '保存资料'}}</button>
+
+    <button class="btn-primary" disabled="{{submitting}}" loading="{{submitting}}" bindtap="saveProfile">
+      {{submitting ? '保存中...' : '保存老师资料'}}
+    </button>
+
+    <view class="card proof-card">
+      <text class="proof-title">老师认证材料</text>
+      <text class="proof-subtitle">上传学生证或录取通知书，后台审核通过后，老师身份会变为已认证。</text>
+
+      <view class="type-grid">
+        <button class="type-btn {{documentType === 'student_id' ? 'type-btn-active' : ''}}" data-value="student_id" bindtap="selectDocumentType">学生证</button>
+        <button class="type-btn {{documentType === 'admission_notice' ? 'type-btn-active' : ''}}" data-value="admission_notice" bindtap="selectDocumentType">录取通知书</button>
+      </view>
+
+      <view class="upload-box" bindtap="chooseProof">
+        <text class="upload-title">{{selectedFileName || '拍照或选择证件图片'}}</text>
+        <text class="upload-sub">支持 camera/album，格式 jpg/png，大小不超过 5MB</text>
+      </view>
+
+      <button class="btn-secondary proof-button" disabled="{{submittingProof}}" loading="{{submittingProof}}" bindtap="submitVerification">
+        {{submittingProof ? '提交中...' : '提交认证材料'}}
+      </button>
+
+      <view wx:if="{{currentRecord}}" class="proof-record">
+        <view class="profile-row">
+          <text class="prow-key">最近提交</text>
+          <text class="prow-val">{{currentRecord.document_type === 'student_id' ? '学生证' : '录取通知书'}}</text>
+        </view>
+        <view class="profile-row">
+          <text class="prow-key">审核状态</text>
+          <text class="prow-val">{{verificationText}}</text>
+        </view>
+        <view wx:if="{{reviewNote}}" class="note-box">
+          <text class="note-title">审核备注</text>
+          <text class="note-content">{{reviewNote}}</text>
+        </view>
+        <button class="btn-secondary preview-button" bindtap="previewCurrentProof">查看已上传图片</button>
+      </view>
+    </view>
   </block>
+
   <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>
 </view>

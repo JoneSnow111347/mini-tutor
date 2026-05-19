@@ -79,7 +79,7 @@ Page({
         api.listApplies({}, true),
       ])
       const myDemands = (demandsRes.data || [])
-        .filter(d => d.user_id === uid)
+        .filter(d => Number(d.user_id) === Number(uid))
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
       const demands = myDemands.map(d => {
@@ -113,6 +113,10 @@ Page({
     } finally {
       if (!background) this.setData({ loading: false })
     }
+  },
+
+  goPublish() {
+    wx.navigateTo({ url: '/pages/publish-demand/publish-demand' })
   },
 
   viewApplications(e) {
@@ -155,7 +159,7 @@ Page({
               const updated = this.data.demands.map(d => ({ ...d, statusChanged: false }))
               this.setData({ demands: updated })
             }, 1200)
-            wx.showToast({ title: '订单已关闭', icon: 'success' })
+            wx.showToast({ title: '已关闭', icon: 'success' })
           }, 380)
         } catch (_) {}
       },

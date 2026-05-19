@@ -1,4 +1,3 @@
-const { confirmLogout } = require('../../utils/page')
 const { api } = require('../../utils/request')
 
 function statusText(status) {
@@ -63,7 +62,9 @@ Page({
   decide(status, label) {
     wx.showModal({
       title: `\u786e\u8ba4${label}`,
-      content: `\u786e\u5b9a${label}\u8fd9\u4f4d\u8001\u5e08\u7684\u7533\u8bf7\u5417\uff1f`,
+      content: status === 'accepted'
+        ? '\u63a5\u53d7\u540e\u8001\u5e08\u5c06\u83b7\u5f97\u4f60\u7684\u8054\u7cfb\u65b9\u5f0f\uff0c\u53ef\u4ee5\u5f00\u59cb\u6c9f\u901a\u3002'
+        : '\u62d2\u7edd\u540e\u8be5\u8001\u5e08\u5c06\u65e0\u6cd5\u7ee7\u7eed\u7533\u8bf7\u6b64\u9700\u6c42\u3002',
       confirmText: label,
       confirmColor: status === 'accepted' ? '#34c759' : '#ff3b30',
       success: async (res) => {
@@ -102,7 +103,4 @@ Page({
     })
   },
 
-  handleGlobalLogout() {
-    confirmLogout(this)
-  },
 })

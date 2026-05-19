@@ -8,6 +8,6 @@
     <text class="form-label">手机号<text class="required">*</text></text>
     <input class="form-input" type="number" maxlength="11" placeholder="请输入手机号" value="{{phone}}" bindinput="onPhoneInput" bindconfirm="handleLogin" />
   </view>
-  <button class="btn-primary" disabled="{{loading}}" bindtap="handleLogin">{{loading ? '登录中...' : '登录'}}</button>
+  <button class="btn-primary" loading="{{loading}}" disabled="{{loading}}" bindtap="handleLogin">{{loading ? '登录中...' : '登录'}}</button>
   <text class="link-text" bindtap="goRegister">还没有账号？立即注册</text>
 </view>

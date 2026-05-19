@@ -1,20 +1,21 @@
 'use strict';
 
 const applyService = require('./apply.service');
+const { success, failure } = require('../../utils/response');
 
 function handleError(res, err) {
-  const status = err.status || 500;
-  const body = { success: false, message: err.message };
-  if (err.fields) body.errors = err.fields;
-  return res.status(status).json(body);
+  return failure(res, err, 'Application request failed');
 }
 
 async function listApplies(req, res) {
   try {
     const filter = {};
     if (req.query.demand_id !== undefined) filter.demand_id = parseInt(req.query.demand_id, 10);
+    if (req.query.teacher_user_id !== undefined) {
+      filter.teacher_user_id = parseInt(req.query.teacher_user_id, 10);
+    }
     const data = await applyService.listApplies(filter);
-    return res.status(200).json({ success: true, data });
+    return success(res, { message: 'Applications loaded', data });
   } catch (err) {
     return handleError(res, err);
   }
@@ -23,7 +24,7 @@ async function listApplies(req, res) {
 async function getApplyById(req, res) {
   try {
     const apply = await applyService.getApplyById(parseInt(req.params.id, 10));
-    return res.status(200).json({ success: true, data: apply });
+    return success(res, { message: 'Application loaded', data: apply });
   } catch (err) {
     return handleError(res, err);
   }
@@ -37,7 +38,7 @@ async function createApply(req, res) {
       teacher_user_id: req.user.id,
       message,
     });
-    return res.status(201).json({ success: true, message: 'Application submitted', data: apply });
+    return success(res, { status: 201, message: 'Application submitted', data: apply });
   } catch (err) {
     return handleError(res, err);
   }
@@ -49,11 +50,11 @@ async function updateApplyStatus(req, res) {
     const { status } = req.body;
 
     if (!status) {
-      return res.status(400).json({ success: false, message: 'status is required' });
+      return failure(res, { status: 400, message: 'status is required' });
     }
 
     const apply = await applyService.updateApplyStatus(id, status);
-    return res.status(200).json({ success: true, message: 'Application status updated', data: apply });
+    return success(res, { message: 'Application status updated', data: apply });
   } catch (err) {
     return handleError(res, err);
   }

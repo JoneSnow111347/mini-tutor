@@ -12,36 +12,31 @@
         <text class="teacher-entry-name">{{teacherSummary.real_name}}</text>
         <text class="teacher-entry-sub">{{teacherSummary.teaching_subjects}}</text>
       </view>
-      <text class="teacher-entry-link">老师资料  </text>
+      <text class="teacher-entry-link">老师资料</text>
     </view>
     <button class="fav-btn-sm {{isFavTeacher ? 'fav-sm-active' : ''}}" catchtap="toggleFavTeacher">
-      {{isFavTeacher ? '♥ 已收藏资料' : '♥ 收藏资料'}}
+      {{isFavTeacher ? '已收藏资料' : '收藏资料'}}
     </button>
   </view>
 
   <view wx:if="{{syncTip}}" class="status-banner banner-info">
     <text class="status-banner-title">{{syncTip}}</text>
-    <text class="status-banner-sub">已同步为"招募中 / 已申请"可见状态。</text>
+    <text class="status-banner-sub">列表会同步显示需求变动和申请结果。</text>
   </view>
 
   <view class="search-card">
     <view class="search-bar">
-      <input class="search-input" placeholder="搜索科目、标题或地区" placeholder-class="placeholder"
-        value="{{keyword}}" bindinput="onKeywordInput" />
+      <input class="search-input" placeholder="搜索科目、标题、区域或地址" placeholder-class="placeholder" value="{{keyword}}" bindinput="onKeywordInput" />
       <text wx:if="{{keyword}}" class="search-clear" bindtap="clearKeyword">清除</text>
     </view>
     <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="filter-row">
-        <view wx:for="{{subjects}}" wx:key="*this"
-          class="filter-chip {{selectedSubject === item ? 'filter-active' : ''}}"
-          data-value="{{item}}" bindtap="selectSubject">{{item}}</view>
+        <view wx:for="{{subjects}}" wx:key="*this" class="filter-chip {{selectedSubject === item ? 'filter-active' : ''}}" data-value="{{item}}" bindtap="selectSubject">{{item}}</view>
       </view>
     </scroll-view>
     <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="filter-row">
-        <view wx:for="{{areas}}" wx:key="*this"
-          class="filter-chip {{selectedArea === item ? 'filter-active' : ''}}"
-          data-value="{{item}}" bindtap="selectArea">{{item}}</view>
+        <view wx:for="{{areas}}" wx:key="*this" class="filter-chip {{selectedArea === item ? 'filter-active' : ''}}" data-value="{{item}}" bindtap="selectArea">{{item}}</view>
       </view>
     </scroll-view>
   </view>
@@ -53,16 +48,16 @@
   <view wx:if="{{loading}}" class="empty-tip">正在同步需求...</view>
   <view wx:elif="{{filteredDemands.length === 0}}" class="empty-tip">暂无符合条件的需求</view>
 
-  <view wx:for="{{filteredDemands}}" wx:key="id"
-    class="card demand-card {{leavingDemandIds[item.id] ? 'card-leaving' : ''}} {{item.statusChanged ? 'card-updated' : ''}}">
+  <view wx:for="{{filteredDemands}}" wx:key="id" class="card demand-card {{leavingDemandIds[item.id] ? 'card-leaving' : ''}} {{item.statusChanged ? 'card-updated' : ''}}">
     <view class="card-row card-tap" data-demand-id="{{item.id}}" bindtap="goDemandDetail">
       <view class="demand-main">
         <text class="card-title">{{item.title}}</text>
         <text class="card-meta">{{item.subject}} · {{item.grade_level}} · {{item.area}}</text>
+        <text wx:if="{{item.address}}" class="card-meta">{{item.address}}</text>
       </view>
       <view class="badge-stack">
         <text class="badge badge-open">招募中</text>
-        <text wx:if="{{newDemandIds[item.id]}}" class="badge badge-new">新</text>
+        <text wx:if="{{item.newTag}}" class="badge badge-new">新</text>
         <text wx:if="{{item.applyStatus}}" class="badge badge-{{item.applyStatus === 'pending' ? 'applied' : item.applyStatus}} {{item.statusChanged ? 'badge-flash' : ''}}">{{item.applyText}}</text>
       </view>
     </view>
@@ -71,16 +66,19 @@
     <view class="tag-row">
       <text class="tag">{{item.class_mode}}</text>
       <text class="tag">{{item.dateText}}</text>
+      <text wx:if="{{item.distanceText}}" class="tag">距离 {{item.distanceText}}</text>
     </view>
 
-    <text wx:if="{{item.applyStatus === 'accepted'}}" class="apply-hint accepted">已接受，等待家长联系 </text>
-    <text wx:elif="{{item.applyStatus === 'rejected'}}" class="apply-hint muted">申请未通过 </text>
-    <text wx:elif="{{item.applyStatus === 'pending'}}" class="apply-hint pending">查看申请状态 </text>
-    <text wx:else class="apply-hint">点击申请接单  </text>
+    <view class="action-row">
+      <text wx:if="{{item.applyStatus === 'accepted'}}" class="apply-hint accepted">已接单，等待家长联系</text>
+      <text wx:elif="{{item.applyStatus === 'rejected'}}" class="apply-hint muted">申请未通过</text>
+      <text wx:elif="{{item.applyStatus === 'pending'}}" class="apply-hint pending">已申请，等待审核</text>
+      <text wx:else class="apply-hint">点击查看并申请</text>
+      <text wx:if="{{item.hasLocation}}" class="map-link" data-id="{{item.id}}" bindtap="openDemandLocation">地图</text>
+    </view>
 
-    <button class="fav-btn {{item.isFav ? 'fav-active' : ''}}"
-      data-id="{{item.id}}" catchtap="toggleFavDemand">
-      {{item.isFav ? '♥ 已收藏' : '♥ 收藏此需求'}}
+    <button class="fav-btn {{item.isFav ? 'fav-active' : ''}}" data-id="{{item.id}}" catchtap="toggleFavDemand">
+      {{item.isFav ? '已收藏' : '收藏此需求'}}
     </button>
   </view>
   <button class="global-logout-btn" bindtap="handleGlobalLogout">退出登录</button>

@@ -1,7 +1,52 @@
+.section-label {
+  margin-bottom: 20rpx;
+  color: #A09890;
+  font-size: 24rpx;
+  font-weight: 500;
+  letter-spacing: 2rpx;
+}
+
 .inline-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18rpx;
+  gap: 16rpx;
+}
+
+.row-head-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.location-pick {
+  color: #FF6B6B;
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  background: #FFF5F2;
+}
+
+.location-pick:active {
+  opacity: 0.7;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 8rpx;
+  color: #B8B0A6;
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+
+.field-error {
+  display: block;
+  margin-top: 8rpx;
+  color: #CF1322;
+  font-size: 24rpx;
+  line-height: 1.5;
 }
 
 .mode-row {
@@ -11,27 +56,69 @@
 
 .mode-chip {
   flex: 1;
-  height: 70rpx;
-  border-radius: 22rpx;
-  background: #f0f3f7;
-  color: #5d6675;
-  font-size: 26rpx;
-  font-weight: 700;
-  line-height: 70rpx;
+  height: 64rpx;
+  border-radius: 18rpx;
+  border: 2rpx solid #E8E5E0;
+  background: #FAFAF8;
+  color: #8C857D;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 64rpx;
   text-align: center;
+  transition: transform 0.15s, border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.mode-chip:active {
+  transform: scale(0.96);
 }
 
 .mode-chip.active {
-  background: #111827;
-  color: #ffffff;
-  box-shadow: 0 12rpx 26rpx rgba(17, 24, 39, 0.18);
+  border-color: #FF6B6B;
+  background: #FFF5F2;
+  color: #FF6B6B;
 }
 
-.privacy-card {
+.location-bar {
+  margin-top: 12rpx;
+  padding: 14rpx 18rpx;
+  border-radius: 14rpx;
+  background: #FAFAF8;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24rpx;
+}
+
+.location-text {
+  font-size: 24rpx;
+  color: #00A87A;
+  font-weight: 500;
+}
+
+.location-clear {
+  font-size: 24rpx;
+  color: #FF6B6B;
+  font-weight: 500;
+}
+
+.privacy-note {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 18rpx;
+  border-radius: 14rpx;
+  background: #FAFAF8;
+}
+
+.privacy-label {
+  color: #00A87A;
+  font-size: 22rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.privacy-desc {
+  color: #A09890;
+  font-size: 22rpx;
 }
 
 .last-field {
@@ -40,5 +127,14 @@
 
 .submit-button {
   margin-top: 8rpx;
+}
+
+.submit-hint {
+  display: block;
+  margin-top: 16rpx;
   margin-bottom: 48rpx;
+  color: #B8B0A6;
+  font-size: 22rpx;
+  text-align: center;
+  line-height: 1.5;
 }

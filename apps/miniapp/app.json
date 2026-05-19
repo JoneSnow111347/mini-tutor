@@ -4,7 +4,6 @@
     "pages/register/register",
     "pages/parent/parent",
     "pages/teacher/teacher",
-    "pages/home/home",
     "pages/parent-register/parent-register",
     "pages/parent-login/parent-login",
     "pages/publish-demand/publish-demand",
@@ -16,17 +15,26 @@
     "pages/teacher-profile/edit-teacher",
     "pages/browse-demands/browse-demands",
     "pages/apply-demand/apply-demand",
+    "pages/identity/verify",
     "pages/my/my",
     "pages/my-orders/my-orders",
     "pages/notifications/notifications"
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#f5f7fb",
+    "navigationBarBackgroundColor": "#FFF8F0",
     "navigationBarTitleText": "\u6b66\u6c49\u5bb6\u6559",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f5f7fb"
+    "backgroundColor": "#FFF8F0"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于选择家教上课地点"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ],
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

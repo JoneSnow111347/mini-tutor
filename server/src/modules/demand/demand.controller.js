@@ -1,18 +1,29 @@
 'use strict';
 
 const demandService = require('./demand.service');
+const { success, failure } = require('../../utils/response');
 
 function handleError(res, err) {
-  const status = err.status || 500;
-  const body = { success: false, message: err.message };
-  if (err.fields) body.errors = err.fields;
-  return res.status(status).json(body);
+  return failure(res, err, 'Demand request failed');
+}
+
+function getAuthenticatedUserId(req) {
+  const rawUserId = req.user && (req.user.id ?? req.user.userId);
+  const userId = Number(rawUserId);
+
+  if (!Number.isInteger(userId) || userId <= 0) {
+    const err = new Error('Unauthorized: missing authenticated user id');
+    err.status = 401;
+    throw err;
+  }
+
+  return userId;
 }
 
 async function listDemands(req, res) {
   try {
     const data = await demandService.listDemands();
-    return res.status(200).json({ success: true, data });
+    return success(res, { message: 'Demands loaded', data });
   } catch (err) {
     return handleError(res, err);
   }
@@ -21,7 +32,7 @@ async function listDemands(req, res) {
 async function getDemandById(req, res) {
   try {
     const demand = await demandService.getDemandById(parseInt(req.params.id, 10));
-    return res.status(200).json({ success: true, data: demand });
+    return success(res, { message: 'Demand loaded', data: demand });
   } catch (err) {
     return handleError(res, err);
   }
@@ -29,8 +40,12 @@ async function getDemandById(req, res) {
 
 async function createDemand(req, res) {
   try {
-    const demand = await demandService.createDemand(req.body);
-    return res.status(201).json({ success: true, message: 'Demand created', data: demand });
+    const userId = getAuthenticatedUserId(req);
+    const demand = await demandService.createDemand({
+      ...req.body,
+      user_id: userId,
+    });
+    return success(res, { status: 201, message: 'Demand created', data: demand });
   } catch (err) {
     return handleError(res, err);
   }
@@ -41,7 +56,7 @@ async function updateDemandById(req, res) {
     const id = parseInt(req.params.id, 10);
 
     const updatable = [
-      'title', 'subject', 'grade_level', 'area',
+      'title', 'subject', 'grade_level', 'area', 'address', 'latitude', 'longitude',
       'class_mode', 'description', 'contact_name', 'contact_phone', 'status'
     ];
     const payload = {};
@@ -52,11 +67,11 @@ async function updateDemandById(req, res) {
     });
 
     if (Object.keys(payload).length === 0) {
-      return res.status(400).json({ success: false, message: 'No updatable fields provided' });
+      return failure(res, { status: 400, message: 'No updatable fields provided' });
     }
 
-    const demand = await demandService.updateDemandById(id, payload);
-    return res.status(200).json({ success: true, message: 'Demand updated', data: demand });
+    const demand = await demandService.updateDemandById(id, payload, req.user.id);
+    return success(res, { message: 'Demand updated', data: demand });
   } catch (err) {
     return handleError(res, err);
   }
